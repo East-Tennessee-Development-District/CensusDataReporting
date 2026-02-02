@@ -1,0 +1,6 @@
+etddBlue <- "#015a71"
+etddGreen <- ""
+lightStripe <- "grey"
+medStripe <- "cornflowerblue"
+borderColor <- "white"
+colorForTextOnETDDBlue <- "white"
