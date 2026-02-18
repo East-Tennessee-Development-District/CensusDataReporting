@@ -4,38 +4,177 @@ if (exists("startrun")) {
   source(here::here("scripts","startHere.R"))
 }
 
+# || Variables
 reset <- FALSE
 
-# if(file.exists(here::here("data","interim","census_2020.csv")) & !reset){
-#     print(fortunes::fortune())
-#   } else {
-#     
-#     vars <- c()
-#     
-#     tempDF <- get_decennial(geography = "place", 
-#                             variables = vars,
-#                             year = 2020,
-#                             # sumfile = "dhc",
-#                             state="TN")
-#     
-#   }
-# if(file.exists(here::here("data","interim","censusblocks.csv")) & !reset){
-#   print(fortunes::fortune())
-# } else {
-#   
-#   vars <- c()
-#   
-#   tempDF <- get_decennial(geography = "block", 
-#                           variables = vars,
-#                           year = 2020,
-#                           # sumfile = "dhc",
-#                           state="TN")
-#   
-# } 
+state <- "tn"
 
+countiesInETDD <- c(
+  "Anderson",
+  "Blount",
+  "Campbell",
+  "Claiborne",
+  "Cocke",
+  "Grainger",
+  "Hamblen",
+  "Jefferson",
+  "Knox",
+  "Loudon",
+  "Monroe",
+  "Morgan",
+  "Roane",
+  "Scott",
+  "Sevier",
+  "Union"
+  )
 
+municipalitiesInETDD <- c(
+  "Clinton",
+  "Norris",
+  "Oak Ridge",
+  "Rocky Top",
+  "Alcoa",
+  "Maryville",
+  "Friendsville",
+  "Rockford",
+  "Louisville",
+  "Townsend",
+  "Caryville",
+  "Jacksboro",
+  "Jellico",
+  "LaFollette",
+  "Cumberland Gap",
+  "Harrogate",
+  "New Tazewell",
+  "Tazewell",
+  "Newport",
+  "Parrottsville",
+  "Bean Station",
+  "Rutledge",
+  "Blaine",
+  "Morristown",
+  "Baneberry",
+  "Dandridge",
+  "Jefferson City",
+  "New Market",
+  "White Pine",
+  "Knoxville",
+  "Farragut",
+  "Loudon",
+  "Lenoir",
+  "Greenback",
+  "Philadelphia",
+  "Madisonville"
+)
 
+# || Functions
+getCensusData <- function(censusYear, state, vars, fileName, surveyName, geographyLevel){
+  varFromAPI <- load_variables(censusYear, dataset=surveyName, cache=TRUE)
+  APIVars <- 
+    c(
+      varFromAPI %>% 
+        filter(str_detect(name, paste(vars, collapse = "|"))) %>% 
+        select(name) %>% 
+        pull()
+    )
+  get_decennial(
+    geography=geographyLevel,
+    variables = APIVars,
+    year = censusYear,
+    output = "tidy",
+    state = state,
+    cache_table = TRUE,
+    # county = countyName,
+    # key = keyring::key_get("CensusApi"),
+    survey = surveyName,
+    show_call = TRUE
+  ) |> 
+    left_join(varFromAPI, by=c("variable"="name")) |> 
+    mutate(
+      label=str_remove_all(label, "!")
+    ) |> 
+    write_csv(file = fileName)
+}
 
+getACSData <- function(acsYear, state, vars, fileName, surveyName, geographyLevel){
+  varFromAPI <- load_variables(acsYear, dataset=surveyName, cache=TRUE)
+  APIVars <- 
+    c(
+      varFromAPI %>% 
+        filter(str_detect(name, paste(vars, collapse = "|"))) %>% 
+        select(name) %>% 
+        pull()
+    )
+  
+  get_acs(
+    geography=geographyLevel,
+    variables = APIVars,
+    year = acsYear,
+    output = "tidy",
+    state = state,
+    cache_table = TRUE,
+    # county = countyName,
+    # key = keyring::key_get("CensusApi"),
+    survey = surveyName,
+    show_call = TRUE
+  ) |> 
+    left_join(varFromAPI, by=c("variable"="name")) |> 
+    mutate(
+      label=str_remove_all(label, "!")
+    ) |> 
+    write_csv(file = fileName)
+  
+}
+
+# || Script
+
+## ||| For figuring
+if(TRUE){}else{
+  varCheck <- load_variables(2020, dataset="pl", cache=TRUE)
+  varCheck |> select(concept) |> distinct()
+  
+  sumFileCheck <- summary_files(2020)
+  
+  acs2020 <- load_variables(acsYear, "acs5", cache = TRUE)
+  v2020 <- load_variables(2020, dataset="cd118", cache=TRUE)
+  censusVars <- ("P3")
+  APIDemVars <- 
+    c(
+      v2020 %>% 
+        filter(str_detect(name, paste(censusVars, collapse = "|"))) %>% 
+        select(name) %>% 
+        pull()
+    )
+}
+# || Getting ACS data
+acsYear <- 2020
+geographyLevel <- "county"
+fileName <- here::here("data","interim",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
+surveyName <- "acs5"
+
+if(file.exists(fileName) & !reset){
+  fortunes::fortune()
+} else {
+  vars <- c(
+    "S0101","S1901", "B19301", "S1901", "B17010", "C24050", 
+    "B08130", "B15002", "S1501", "B25034", "B25003"
+  )
+  
+  getACSData(acsYear, state, vars, fileName, surveyName, geographyLevel)
+}
+
+# || Getting census data
+  censusYear <- 2020
+  geographyLevel <- "county"
+  fileName <- here::here("data","interim",str_c("censusData",as.character(censusYear),geographyLevel,".csv"))
+
+if (file.exists(fileName) & !reset){
+    print(fortunes::fortune())
+  } else{
+    surveyName <- "pl"
+    vars <- c("P1","H1","P12","P13")
+    getCensusData(censusYear, state, vars, fileName, surveyName,geographyLevel)
+}
 
 if (file.exists(here::here("data","interim","lehdr_tn_od_main_JT00_2020.csv")) & !reset) {
   print(fortunes::fortune())
@@ -56,6 +195,7 @@ if (file.exists(here::here("data","interim","lehdr_tn_od_main_JT00_2020.csv")) &
     }
 }
 
+# || get LODES
 
 if (file.exists(here::here("data","interim","lehdr_tn_wac_main_JT00_2020.csv"))) {
   print(fortunes::fortune())
