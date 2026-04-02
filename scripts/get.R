@@ -3,128 +3,13 @@ if (exists("startrun")) {
 } else {
   source(here::here("scripts","startHere.R"))
 }
-
-# || Variables
-reset <- FALSE
-
-state <- "tn"
-
-countiesInETDD <- c(
-  "Anderson",
-  "Blount",
-  "Campbell",
-  "Claiborne",
-  "Cocke",
-  "Grainger",
-  "Hamblen",
-  "Jefferson",
-  "Knox",
-  "Loudon",
-  "Monroe",
-  "Morgan",
-  "Roane",
-  "Scott",
-  "Sevier",
-  "Union"
-  )
-
-municipalitiesInETDD <- c(
-  "Clinton",
-  "Norris",
-  "Oak Ridge",
-  "Rocky Top",
-  "Alcoa",
-  "Maryville",
-  "Friendsville",
-  "Rockford",
-  "Louisville",
-  "Townsend",
-  "Caryville",
-  "Jacksboro",
-  "Jellico",
-  "LaFollette",
-  "Cumberland Gap",
-  "Harrogate",
-  "New Tazewell",
-  "Tazewell",
-  "Newport",
-  "Parrottsville",
-  "Bean Station",
-  "Rutledge",
-  "Blaine",
-  "Morristown",
-  "Baneberry",
-  "Dandridge",
-  "Jefferson City",
-  "New Market",
-  "White Pine",
-  "Knoxville",
-  "Farragut",
-  "Loudon",
-  "Lenoir",
-  "Greenback",
-  "Philadelphia",
-  "Madisonville"
-)
-
-# || Functions
-getCensusData <- function(censusYear, state, vars, fileName, surveyName, geographyLevel){
-  varFromAPI <- load_variables(censusYear, dataset=surveyName, cache=TRUE)
-  APIVars <- 
-    c(
-      varFromAPI %>% 
-        filter(str_detect(name, paste(vars, collapse = "|"))) %>% 
-        select(name) %>% 
-        pull()
-    )
-  get_decennial(
-    geography=geographyLevel,
-    variables = APIVars,
-    year = censusYear,
-    output = "tidy",
-    state = state,
-    cache_table = TRUE,
-    # county = countyName,
-    # key = keyring::key_get("CensusApi"),
-    survey = surveyName,
-    show_call = TRUE
-  ) |> 
-    left_join(varFromAPI, by=c("variable"="name")) |> 
-    mutate(
-      label=str_remove_all(label, "!")
-    ) |> 
-    write_csv(file = fileName)
+if (exists("fxsVars")) {
+  print(fortunes::fortune())
+} else {
+  source(here::here("scripts","fxsAndVars.R"))
 }
 
-getACSData <- function(acsYear, state, vars, fileName, surveyName, geographyLevel){
-  varFromAPI <- load_variables(acsYear, dataset=surveyName, cache=TRUE)
-  APIVars <- 
-    c(
-      varFromAPI %>% 
-        filter(str_detect(name, paste(vars, collapse = "|"))) %>% 
-        select(name) %>% 
-        pull()
-    )
-  
-  get_acs(
-    geography=geographyLevel,
-    variables = APIVars,
-    year = acsYear,
-    output = "tidy",
-    state = state,
-    cache_table = TRUE,
-    # county = countyName,
-    # key = keyring::key_get("CensusApi"),
-    survey = surveyName,
-    show_call = TRUE
-  ) |> 
-    left_join(varFromAPI, by=c("variable"="name")) |> 
-    mutate(
-      label=str_remove_all(label, "!")
-    ) |> 
-    write_csv(file = fileName)
-  
-}
+
 
 # || Script
 
@@ -215,13 +100,7 @@ if (file.exists(here::here("data","interim","lehdr_tn_wac_main_JT00_2020.csv")))
       filename <-  str_c("lehdr_tn_",type,"_main_JT00_",as.character(year),".csv")
       write_csv(tempDF, here::here('data', "interim",filename))
     }
-    
-    
-    
   }}
-
-
-
 
 if (file.exists(here::here("data","interim","lehdrBlockConverison.csv"))) {
   print(fortunes::fortune())

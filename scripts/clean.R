@@ -3,49 +3,20 @@ if (exists("startrun")) {
 } else {
   source(here::here("scripts","startHere.R"))
 }
-
-# fileName <-  (here::here("data","interim","lehdr_tn_wac_main_JT00_2010.csv"))
-# || Variables
-reset <- FALSE
-countiesInETDD <- c(
-  "Anderson County",
-  "Blount County",
-  "Campbell County",
-  "Claiborne County",
-  "Cocke County",
-  "Grainger County",
-  "Hamblen County",
-  "Jefferson County",
-  "Knox County",
-  "Loudon County",
-  "Monroe County",
-  "Morgan County",
-  "Roane County",
-  "Scott County",
-  "Sevier County",
-  "Union County"
-)
-# || Functions
-loadIfExists <- function(fileName){
-  
-  if (file.exists(fileName)) {
-    tmpData <- read_csv(fileName)
-    return(tmpData)
-    
-  } else {
-    source(here::here("scripts", "get.R"))
-    tmpData <- read_csv(fileName)
-    return(tmpData)
-    
-  }
-  
-  
+if (exists("fxsVars")) {
+  print(fortunes::fortune())
+} else {
+  source(here::here("scripts","fxsAndVars.R"))
 }
 
+# || Variables
+# reset <- FALSE
+# || Functions
 
 # || Script
 acsYear <- 2020
 geographyLevel <- "county"
+# ACS
 fileName <- here::here("data","clean",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
 interimDataFileName <- here::here("data","interim",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
 
@@ -56,6 +27,7 @@ if(file.exists(fileName) & !reset){
   acsDF <- loadIfExists(interimDataFileName)
   acsDF |> 
     mutate(
+      year=acsYear,
       NAME = str_remove(NAME, ", Tennessee"),
       cleanedLabel = case_when(
         concept == "MEANS OF TRANSPORTATION TO WORK BY PLACE OF WORK--STATE AND COUNTY LEVEL" & 
