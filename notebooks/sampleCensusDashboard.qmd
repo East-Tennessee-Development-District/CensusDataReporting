@@ -1,0 +1,601 @@
+---
+title: | 
+  ![](../resources/ETDDLogo.svg){width=1in} ETDD Census Data
+logo:
+    small: ../resources/ETDDLogo.svg
+    medium: ../resources/ETDDLogo.svg
+format: 
+  dashboard: 
+      css: ../resources/oddHighlight.css
+      theme: 
+        light: flatly
+        dark: darkly
+      scrolling: true
+embed-resources: true
+execute: 
+  cache: true
+params:
+  refreshdata: FALSE
+---
+
+```{r initializing}
+#| include: false
+#| cache: true
+
+if (exists("startrun")) {
+  print(fortunes::fortune())
+} else {
+  source(here::here("Scripts","StartHere.r"))
+}
+if (exists("fxsVars")) {
+  print(fortunes::fortune())
+} else {
+  source(here::here("scripts","fxsAndVars.R"))
+}
+source(here::here("scripts","defineColors.R"))
+
+currentCounty <- "Anderson"
+currentMunicipalities <- municipalitiesInAnderson
+
+if (file.exists(here::here("data","clean","ods2010.csv"))) {
+ empData2010 <- read_csv(here::here("data","clean","ods2010.csv")) |> filter(workCountyName == currentCounty)
+} else {
+  source(here::here("scripts", "clean.R"))
+  empData2010 <- read_csv(here::here("data","clean","ods2010.csv"))  |> filter(workCountyName == currentCounty)
+}
+
+if (file.exists(here::here("data","clean","acsDataCombined.csv"))) {
+ acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
+} else {
+  source(here::here("scripts", "clean.R"))
+  acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
+}
+if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
+ censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
+} else {
+  source(here::here("scripts", "clean.R"))
+  censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
+}
+
+
+
+
+
+```
+
+# Overview
+
+## Row {.tabset}
+
+### Overview of this product
+
+### Description of the data and data sources
+
+### Shiny App (to add later)
+
+# Anderson
+
+## Row {.tabset}
+### Description
+
+PUT MAP HERE
+
+INTRODUCTION
+This report is part of a series, which examines statistical data from U.S. Census materials regarding
+economic and demographic characteristics in the sixteen counties that make up the East
+Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with
+American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.
+
+Topics that will be discussed in this summary report for Anderson County are
+• population growth from 1950 to 2020;
+• population density;
+• demographic characteristics in terms of sex, race, and age;
+• economic characteristics in terms of family income, household income, per capita income,
+and poverty status of families;
+• employment classification according to industry;
+• labor force characteristics in terms of place of work and commuting patterns;
+• educational level of the adult population;
+• and housing characteristics in terms of age of the housing stock and type of tenure.
+
+### Demographics{.tabset}
+
+```{r}
+#| title: Population and Growth
+
+censusDf |> filter(concept == "RACE", cleanedLabel=="Total")
+
+```
+
+
+```{r}
+#| title: Population Density
+
+
+
+```
+
+
+```{r}
+#| title: Population Descriptions
+
+# totalOfRace <- censusDf |> (concept == "RACE" & cleanedLabel == "Total") |> pull()
+# totalOfSex <- censusDf |> (concept == "RACE" & cleanedLabel == "Total") |> pull()
+# totalOfAge <- censusDf |> (concept == "RACE" & cleanedLabel == "Total") |> pull()
+
+censusDf |> filter(concept=="RACE") 
+
+  
+
+# Sex
+
+
+# Race
+
+# Age (use pyramid for this?)
+
+
+```
+
+Population and Growth, Anderson County and Municipalities, 1950 - 2020
+Population Density, Anderson County and Municipalities, 2020 
+Population by Sex, Race, and Age, Anderson County,
+2010 and 2020
+Population by Sex and Race, Anderson County and Municipalities,
+2020
+
+```{r}
+totalOfEducation <- acsDf |> 
+     filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER" & NAME == "Anderson County" & cleanedLabel == "Total") |> pull()
+acsDf |> 
+     filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER" & NAME == "Anderson County" & cleanedLabel != "Other") |> 
+  mutate(pctOfEstimate = estimate/totalOfEducation) |> 
+  select(-concept) |> 
+  DT::datatable(
+    filter="top",
+    extensions = c('Buttons', 
+     'FixedHeader'),
+    options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'print'),
+    scrollX = TRUE,
+   fixedHeader=TRUE,
+  initComplete = DT::JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
+    "}")
+    ),
+  caption = "IN-COMMUTING JOB COUNTS: ANDERSON COUNTY LABORERS BY COUNTIES WHERE LABORERS RESIDE",
+  colnames = c('Place' = 'NAME', 'Level of Education' = 'cleanedLabel', 'Number of People' = 'estimate',
+               'Percentage of People' = 'pctOfEstimate')
+  ) |> 
+  DT::formatPercentage('Percentage of People', 0) |>
+  DT::formatCurrency('Number of People', currency = "", digits=0)
+
+acsDf |> 
+     filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER") |> 
+     ggplot(aes(x=cleanedLabel, y=estimate)) +
+     geom_bar(stat="identity")
+```
+```{r}
+#| title: Housing Units by Year of Construction
+
+tmpDf <- acsDf |> filter(concept == "YEAR STRUCTURE BUILT") |> 
+  pivot_wider(
+    names_from = cleanedLabel,
+    values_from = estimate
+  ) |> 
+  select(-year, -concept)
+tmpDf |> 
+  DT::datatable(
+    filter="top",
+    extensions = c('Buttons', 
+     'FixedHeader'),
+    options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'print'),
+    scrollX = TRUE,
+   fixedHeader=TRUE,
+  initComplete = DT::JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
+    "}")
+    ),
+  caption = "Housing Units by Year of Construction",
+  colnames = c('Place' = 'NAME')
+  ) |> 
+  DT::formatCurrency(which(sapply(tmpDf,is.numeric)), currency = "", digits=0)
+
+acsDf |> filter(concept == "YEAR STRUCTURE BUILT" & cleanedLabel != "Total") |> 
+  ggplot(aes(x=NAME, y=estimate, fill = cleanedLabel))+
+  geom_bar(stat = "identity")
+
+acsDf |> filter(concept == "YEAR STRUCTURE BUILT" &  cleanedLabel != "Total") |> 
+  ggplot(aes(x=NAME, y=estimate, fill = cleanedLabel))+
+  geom_bar(stat = "identity", position = "dodge")
+
+acsDf |> filter(concept == "YEAR STRUCTURE BUILT" &  cleanedLabel != "Total") |> 
+ggplot(aes(x = NAME,
+           fill = cleanedLabel, y = estimate)) + 
+  geom_bar(position = "fill", stat = "identity") +
+  scale_y_continuous(breaks = seq(0, 1, .2)) +
+  scale_fill_brewer(palette = "Set2") +
+  labs(y = "Percent", 
+       fill="Year Structure Built",
+       x = "Place",
+       title = "Year Structure Built by Place")
+```
+
+```{r}
+#| title: Housing Units by Type of Tenure
+
+tmpDf <- acsDf |> filter(concept == "TENURE") |> 
+  pivot_wider(
+    names_from = cleanedLabel,
+    values_from = estimate
+  ) |> 
+  select(-year, -concept)
+tmpDf |> 
+  DT::datatable(
+    filter="top",
+    extensions = c('Buttons', 
+     'FixedHeader'),
+    options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'print'),
+    scrollX = TRUE,
+   fixedHeader=TRUE,
+  initComplete = DT::JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
+    "}")
+    ),
+  caption = "Housing Units by Tenure Status",
+  colnames = c('Place' = 'NAME')
+  ) |> 
+  DT::formatCurrency(which(sapply(tmpDf,is.numeric)), currency = "", digits=0)
+
+
+acsDf |> filter(concept == "TENURE") |> 
+  ggplot(aes(x=NAME, y= estimate, fill = cleanedLabel)) +
+    geom_bar(position = position_dodge(preserve = "single"),stat="identity")
+```
+
+Educational Level of Persons 25 Years and Older, Anderson County and
+State of Tennessee, 2019
+Educational Level of Persons 25 Years and Older, Anderson County and
+Municipalities, 2019
+Housing Units by Year of Construction, Anderson County and Municipalities,
+Pre 1939 - 2019
+Housing Units by Type of Tenure, Anderson County and Municipalities,
+2010 and 2019 
+
+```{r}
+totalJobs <- empData2010 |> 
+  filter(workCountyName == "Anderson") |> 
+  select(numberOfJobs) |> 
+  summarize(sum(numberOfJobs)) |> 
+  pull()
+
+topFiveCounties <- empData2010 |> 
+  filter(workCountyName == "Anderson") |> 
+  # column_to_rownames(var="homeCountyName") |> 
+  top_n(5) |> 
+  select(homeCountyName) |> 
+  pull()
+
+empDataSubset <- empData2010 |> 
+  filter(workCountyName == "Anderson") |> 
+  mutate(
+    homeCountyName=ifelse(homeCountyName %in% topFiveCounties, homeCountyName, "All Other Locations"),
+    ) |> 
+  group_by(homeCountyName) |> 
+  summarize(
+    numberOfJobs=sum(numberOfJobs),
+    percentageOfJobs=numberOfJobs/totalJobs
+    ) |> 
+  ungroup() |> 
+  mutate(isNotOther = ifelse(homeCountyName == "All Other Locations",0,1)) |> 
+  arrange(desc(isNotOther),desc(numberOfJobs) ) |> 
+    select(-isNotOther)
+  
+  
+```
+
+```{r}
+#| title: TableOpt1
+empDataSubset |> 
+    gt(rowname_col = "homeCountyName") |>
+   grand_summary_rows(
+    columns=numberOfJobs,
+    fns = 
+      list(label = "Total In-Commuting Jobs", fn = "sum")
+    ,
+    fmt = ~ fmt_number(., use_seps = TRUE, decimals = 0)  
+    ) |> 
+  grand_summary_rows(
+     columns=percentageOfJobs,
+    fns = list(
+      list(label = "Total In-Commuting Jobs", fn = "sum")
+    ),
+    fmt = ~ fmt_percent(., decimals = 0)
+    ) |> 
+  fmt_percent(
+    columns = percentageOfJobs
+  ) |> 
+  fmt_number(
+    columns = numberOfJobs,
+    decimals = 0
+  ) |> 
+   tab_header(
+    title = "IN-COMMUTING JOB COUNTS:
+\nANDERSON COUNTY LABORERS
+\nBY COUNTIES WHERE LABORERS RESIDE"
+  ) |> 
+    tab_options(
+      heading.background.color = etddBlue,
+      column_labels.background.color = etddBlue
+    ) |> 
+  tab_style(
+    style = list(
+      cell_borders(sides = "all", color = borderColor, weight = px(3))
+    ),
+    locations = list(
+      cells_body(
+      columns = everything()
+    ),
+    cells_column_labels()
+  )
+  ) |> 
+  tab_style(style = cell_fill(color = lightStripe),
+            locations = cells_body(rows = c(1, 3, 5))) |> 
+  tab_style(style = cell_fill(color = medStripe),
+            locations = cells_body(rows = c(2, 4, 6))) |> 
+  tab_style(style = cell_fill(color = lightStripe),
+            locations = cells_grand_summary()
+  ) |> 
+  tab_style(
+      style = list(
+        cell_fill(color = etddBlue),
+        cell_text(color = colorForTextOnETDDBlue)
+      ),
+      locations = list(cells_stub(), cells_stub_grand_summary())
+  )|>
+   cols_label(
+    numberOfJobs = "Job Count",
+    percentageOfJobs = "Percentage",
+    homeCountyName="Laborer’s County of Residence"
+  )
+
+```
+### Economics
+Income Comparison, Anderson County, State of Tennessee, and United States,
+2009 and 2019
+Income Comparison, Anderson County and Municipalities, 2019
+
+Poverty Status of Families by Type, Anderson County, 2009 and 2019
+Poverty Status of Families, Anderson County and Municipalities, 2019...................... 14
+Table 10 Poverty Status of Female Householder Families, Anderson County and
+Municipalities, 2019
+Employment by Industry, Anderson County, 1960 - 2019 
+Employment by Industry Anderson County and Municipalities, 2019
+Labor Force by Place of Work, Anderson County, 1970 - 2019
+Commuter Patterns, Anderson County, 2019
+Labor Force by Place of Work, Anderson County and Municipalities, 2019
+
+```{r}
+#| title: "IN-COMMUTING JOB COUNTS: ANDERSON COUNTY LABORERS BY COUNTIES WHERE LABORERS RESIDE"
+pctVars <- c("percentageOfJobs")
+pctWholeVars <- c("")
+total <- empDataSubset %>% 
+      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE))) %>% 
+      mutate(homeCountyName = "Total")
+empDataSubset |> 
+  bind_rows(total) |> 
+  #  mutate(across(any_of(pctVars), ~ 
+  #                 str_c(
+  #                   as.character(
+  #                     round(
+  #                       (ifelse(
+  #                         str_detect(
+  #                           .x,'Rate'),.x,.x*100
+  #                         )
+  #                        )
+  #                       , digits=1)
+  #                     )
+  #                   , '%')
+  #               )) %>% 
+  # mutate(across(any_of(pctWholeVars), ~ 
+  #                 str_c(
+  #                   as.character(
+  #                     .x
+  #                     )
+  #                   , '%')
+  #               )) |> 
+ DT::datatable(
+    filter="top",
+    extensions = c('Buttons', 
+     'FixedHeader'),
+    options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'print'),
+    scrollX = TRUE,
+   fixedHeader=TRUE,
+  initComplete = DT::JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
+    "}")
+    ),
+  caption = "IN-COMMUTING JOB COUNTS: ANDERSON COUNTY LABORERS BY COUNTIES WHERE LABORERS RESIDE",
+  colnames = c('Home County' = 'homeCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs')
+  ) |> 
+  DT::formatPercentage('Percentage of Jobs', 0) |> 
+  DT::formatCurrency('Number of Jobs', currency = "", digits=0)
+```
+
+```{r}
+(empDataSubset |> 
+  ggplot(aes(x=homeCountyName,y=numberOfJobs, fill=homeCountyName)) +
+  geom_bar(stat = "identity")+
+  labs(x = "Home County", 
+       y = "Number of Jobs", 
+       title = "Number of Jobs by County")) |> 
+  plotly::ggplotly()
+  
+```
+
+
+# Blount
+
+## Row
+### Column{.tabset}
+```{r}
+totalJobs <- empData2010 |> 
+  filter(workCountyName == "Anderson") |> 
+  select(numberOfJobs) |> 
+  summarize(sum(numberOfJobs)) |> 
+  pull()
+
+topFiveCounties <- empData2010 |> 
+  filter(workCountyName == "Anderson") |> 
+  # column_to_rownames(var="homeCountyName") |> 
+  top_n(5) |> 
+  select(homeCountyName) |> 
+  pull()
+
+empDataSubset <- empData2010 |> 
+  filter(workCountyName == "Anderson") |> 
+  mutate(
+    homeCountyName=ifelse(homeCountyName %in% topFiveCounties, homeCountyName, "All Other Locations"),
+    ) |> 
+  group_by(homeCountyName) |> 
+  summarize(
+    numberOfJobs=sum(numberOfJobs),
+    percentageOfJobs=numberOfJobs/totalJobs
+    ) |> 
+  ungroup() |> 
+  mutate(isNotOther = ifelse(homeCountyName == "All Other Locations",0,1)) |> 
+  arrange(desc(isNotOther),desc(numberOfJobs) ) |> 
+    select(-isNotOther)
+  
+  
+```
+
+```{r}
+#| title: TableOpt1
+empDataSubset |> 
+    gt(rowname_col = "homeCountyName") |>
+   grand_summary_rows(
+    columns=numberOfJobs,
+    fns = 
+      list(label = "Total In-Commuting Jobs", fn = "sum")
+    ,
+    fmt = ~ fmt_number(., use_seps = TRUE, decimals = 0)  
+    ) |> 
+  grand_summary_rows(
+     columns=percentageOfJobs,
+    fns = list(
+      list(label = "Total In-Commuting Jobs", fn = "sum")
+    ),
+    fmt = ~ fmt_percent(., decimals = 0)
+    ) |> 
+  fmt_percent(
+    columns = percentageOfJobs
+  ) |> 
+  fmt_number(
+    columns = numberOfJobs,
+    decimals = 0
+  ) |> 
+   tab_header(
+    title = "IN-COMMUTING JOB COUNTS:
+\nANDERSON COUNTY LABORERS
+\nBY COUNTIES WHERE LABORERS RESIDE"
+  ) |> 
+    tab_options(
+      heading.background.color = etddBlue,
+      column_labels.background.color = etddBlue
+    ) |> 
+  tab_style(
+    style = list(
+      cell_borders(sides = "all", color = borderColor, weight = px(3))
+    ),
+    locations = list(
+      cells_body(
+      columns = everything()
+    ),
+    cells_column_labels()
+  )
+  ) |> 
+  tab_style(style = cell_fill(color = lightStripe),
+            locations = cells_body(rows = c(1, 3, 5))) |> 
+  tab_style(style = cell_fill(color = medStripe),
+            locations = cells_body(rows = c(2, 4, 6))) |> 
+  tab_style(style = cell_fill(color = lightStripe),
+            locations = cells_grand_summary()
+  ) |> 
+  tab_style(
+      style = list(
+        cell_fill(color = etddBlue),
+        cell_text(color = colorForTextOnETDDBlue)
+      ),
+      locations = list(cells_stub(), cells_stub_grand_summary())
+  )|>
+   cols_label(
+    numberOfJobs = "Job Count",
+    percentageOfJobs = "Percentage",
+    homeCountyName="Laborer’s County of Residence"
+  )
+
+```
+
+```{r}
+#| title: TableOpt2
+pctVars <- c("percentageOfJobs")
+pctWholeVars <- c("")
+total <- empDataSubset %>% 
+      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE))) %>% 
+      mutate(homeCountyName = "Total")
+empDataSubset |> 
+  bind_rows(total) |> 
+  #  mutate(across(any_of(pctVars), ~ 
+  #                 str_c(
+  #                   as.character(
+  #                     round(
+  #                       (ifelse(
+  #                         str_detect(
+  #                           .x,'Rate'),.x,.x*100
+  #                         )
+  #                        )
+  #                       , digits=1)
+  #                     )
+  #                   , '%')
+  #               )) %>% 
+  # mutate(across(any_of(pctWholeVars), ~ 
+  #                 str_c(
+  #                   as.character(
+  #                     .x
+  #                     )
+  #                   , '%')
+  #               )) |> 
+ DT::datatable(
+    filter="top",
+    extensions = c('Buttons', 
+     'FixedHeader'),
+    options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'print'),
+    scrollX = TRUE,
+   fixedHeader=TRUE,
+  initComplete = DT::JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
+    "}")
+    ),
+  colnames = c('Home County' = 'homeCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs')
+  ) |> 
+  DT::formatPercentage('Percentage of Jobs', 0)
+```
+
+```{r}
+
+```
+
