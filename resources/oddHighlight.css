@@ -1,0 +1,22 @@
+table.dataTable tr.odd{
+  background-color:#b9d1c4;
+  ;
+}
+
+table.dataTable tr.even{
+  background-color:#cce4d7;
+  ;
+}
+
+.quarto-title-block .quarto-title-banner {
+  background-image: url(etddLogo.png);
+  background-size: 300px;
+  background-position: left;
+  background-repeat: no-repeat;
+  padding-left: 10px;
+  background-origin: content-box;
+}
+/*
+table.dataTable tr.odd { background-color: white;  border:1px lightgrey;}
+table.dataTable tr.even{ background-color: white; border:1px lightgrey; }
+*/
