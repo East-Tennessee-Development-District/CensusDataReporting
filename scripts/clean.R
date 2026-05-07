@@ -105,11 +105,12 @@ if(file.exists(fileName) & !reset){
         concept == "YEAR STRUCTURE BUILT"
         ~ str_remove(label, "EstimateTotal:Built "),
         concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
-          label == "EstimateTotal:"
+          label == "EstimateTotal:" | label == "EstimateTotal"
         ~ "Total",
         concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
-          !str_detect(label, "([\\w\\s\\,]*:){2,}")
-        ~ str_remove(label,"EstimateTotal:"),
+          !str_detect(label, "([\\w\\s\\,]*:){2,}") & 
+          str_count(label, "([a-z][A-Z])")<3
+        ~ str_remove(str_remove(label,"EstimateTotal:"),"EstimateTotal"),
         concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER" &
           label == "EstimateTotal:"
         ~ "Total",
@@ -142,63 +143,68 @@ if(file.exists(fileName) & !reset){
           str_detect(label,"Professional school degree") |
           str_detect(label,"Doctorate degree")
         ~ "Graduate or Professional Degree",
-        concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
-          !str_detect(label, "([\\w\\s\\,]*:){2,}") &
-          (str_detect(label, "Wholesale") |
-             str_detect(label, "Retail") |
-             str_detect(label, "Transportation") |
-             str_detect(label, "Finance") 
-             )
-        ~ "Trade, Finance, Insurance & Real Estate",
-        concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
-          !str_detect(label, "([\\w\\s\\,]*:){2,}") &
-          (str_detect(label, "Information") |
-             str_detect(label, "waste") |
-             str_detect(label, "Educational") |
-             str_detect(label, "Arts") 
-          )
-        ~ "Professional Services",
-        concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
-          !str_detect(label, "([\\w\\s\\,]*:){2,}") &
-          (str_detect(label, "Other services")
-          )
-        ~ "OtherInt",
+        concept == "AGE AND SEX" &
+          str_detect(label,"Estimate(Female|Male|Total)Total populationAGE")
+          # EstimateFemaleTotal populationAGEUnder 5 years 
+          # str_detect(label, "AGE") &
+          # !str_detect(label, "CATEGORIES") &
+          # !str_detect(label, "Percent") & 
+          # str_detect(label, "Total Population")
+        ~ str_remove(str_remove(label,"Estimate"),"Total population AGE"),
           
         .default= "Other"
       )
     ) |> 
-    # filter(NAME=="Anderson County", str_detect(concept, "YEAR STRUCTURE"))|>
-    # select(estimate, label, cleanedLabel) |>
-    # print(n=100)
+    
+    mutate(cleanedLabel= case_when(
+      concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
+        (str_detect(cleanedLabel, "Wholesale") |
+                str_detect(cleanedLabel, "Retail") |
+                str_detect(cleanedLabel, "Transportation") |
+                str_detect(cleanedLabel, "Finance")
+             )
+      ~ str_c("Trade, Finance, Insurance & Real Estate: ", cleanedLabel),
+      concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
+        # !str_detect(label, "([\\w\\s\\,]*:){2,}") &
+        (str_detect(cleanedLabel, "Information") |
+           str_detect(cleanedLabel, "waste") |
+           str_detect(cleanedLabel, "Educational") |
+           str_detect(cleanedLabel, "Arts")
+        )
+      ~ str_c("Professional Services: ",cleanedLabel),
+      concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
+        # !str_detect(label, "([\\w\\s\\,]*:){2,}") &
+        (str_detect(cleanedLabel, "Other services")
+        )
+      ~ str_c("Other: ",cleanedLabel),
+      .default=cleanedLabel
+    )) |>
+    
+
     filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDD) |> 
+ 
     group_by(NAME,concept,cleanedLabel,year) |> 
-    summarize(estimate=sum(estimate)) |> 
-    # filter(NAME=="Anderson County", str_detect(concept, "INDUSTRY"))|> 
-    # print(n=100)
+
     write_csv(fileName)
   
-  # add totals for poverty by female headed + kids
-  
-  acsDF |> select(concept) |> distinct() |> pull() # print(n=100)
-  acsDF |> filter(str_detect(concept,"SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER")) |> 
-    select(label) |> distinct() |> pull() #print(n=100)
-  acsDF |> filter(NAME=="Anderson County, Tennessee") |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER")
-}}
+ }}
 
 }
 
 fileName <- here::here("data","clean","acsDataCombined.csv")
-
+rm(combinedAcsDf)
 if(file.exists(fileName) & !reset){print(fortunes::fortune())} else {
   
   for (geographyLevel in c("county", "place")){
-    for (censusYear in censusYears){
+    for (acsYear in acsYears){
       readingFileName <- here::here("data","clean",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
       if(exists("combinedAcsDf")){
         combinedAcsDf <- combinedAcsDf |> 
           rbind(read_csv(readingFileName))
+        
       } else {
         combinedAcsDf <- read_csv(readingFileName)
+        
       }
       
     }}
