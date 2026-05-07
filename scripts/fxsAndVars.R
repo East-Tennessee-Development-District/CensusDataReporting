@@ -215,8 +215,8 @@ getCensusData <- function(censusYear, state, vars, fileName, surveyName, geograp
     write_csv(file = fileName)
 }
 
-getACSData <- function(acsYear, state, vars, fileName, surveyName, geographyLevel){
-  varFromAPI <- load_variables(acsYear, dataset=surveyName, cache=TRUE)
+getACSData <- function(acsYear, state, vars, fileName, surveyName, geographyLevel, surveyVarName = surveyName){
+  varFromAPI <- load_variables(acsYear, dataset=surveyVarName, cache=TRUE)
   APIVars <- 
     c(
       varFromAPI %>% 

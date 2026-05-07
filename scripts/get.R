@@ -35,7 +35,9 @@ if(TRUE){}else{
 for (geographyLevel in c("county", "place")){
   for (acsYear in c(2010,2020)){
 fileName <- here::here("data","interim",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
+subFileName <- here::here("data","interim",str_c("acsDataSubject",as.character(acsYear),geographyLevel,".csv"))
 surveyName <- "acs5"
+subSurveyName <- "acs5/subject"
 
 if(file.exists(fileName) & !reset){
   fortunes::fortune()
@@ -45,6 +47,11 @@ if(file.exists(fileName) & !reset){
     "B08130", "B15002", "S1501", "B25034", "B25003"
   )
   getACSData(acsYear, state, vars, fileName, surveyName, geographyLevel)
+  
+  vars <- c(
+    "S0101","S1901", "S1901", "S1501"
+  )
+  getACSData(acsYear, state, vars, subFileName, surveyName, geographyLevel, subSurveyName)
 }}}
 
 # || Getting census data
