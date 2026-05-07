@@ -15,6 +15,21 @@ if (exists("fxsVars")) {
 
 # || Script
 
+# Place Files
+censusYear <- 2020
+for (geoLevel in c("county","place")){
+  fileName <- here::here("data","interim",str_c("tigerFiles",as.character(censusYear),geographyLevel,".gpkg"))
+  fileNameToWrite <- here::here("data","clean",str_c("tigerFiles",as.character(censusYear),geographyLevel,".gpkg"))
+  
+  sfDf <- sf::read_sf(fileName) #|> 
+    # filter(NAME %in% countiesInETDDNameOnly | NAME %in% municipalitiesInETDD) 
+  sfDf |> 
+    mutate(area=(((sf::st_area(sfDf) * 10.7639)/27878400) )) |> 
+    select(GEOID, NAME, area) |> 
+    sf::st_write(fileNameToWrite, append = FALSE)
+
+}
+
 # ACS
 for (geoLevel in c("county", "place")){
   for (acsYear in acsYears){
@@ -22,13 +37,17 @@ for (geoLevel in c("county", "place")){
   # acsYear <- 2020
   
 fileName <- here::here("data","clean",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
+interimSubFileName <- here::here("data","interim",str_c("acsDataSubject",as.character(acsYear),geographyLevel,".csv"))
 interimDataFileName <- here::here("data","interim",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
 
-if(file.exists(fileName) & !reset){
+# if(file.exists(fileName) & !reset){
+if(FALSE){
   print(fortunes::fortune())
 } else{
   
-  acsDF <- loadIfExists(interimDataFileName)
+  acsDF <- loadIfExists(interimDataFileName) |> 
+    bind_rows(loadIfExists(interimSubFileName))
+              
   if("value" %in% colnames(acsDF)){
     acsDF <- acsDF |> mutate(estimate=value)
   }
@@ -214,6 +233,7 @@ if(file.exists(fileName) & !reset){print(fortunes::fortune())} else {
 
 # Census
 for (geographyLevel in c("county", "place")){
+  placeFileName <- here::here("data","clean",str_c("tigerFiles",as.character(2020),geographyLevel,".gpkg"))
   for (censusYear in censusYears){
   fileName <- here::here("data","clean",str_c("censusData",as.character(censusYear),geographyLevel,".csv"))
   interimDataFileName <- here::here("data","interim",str_c("censusData",as.character(censusYear),geographyLevel,".csv"))
@@ -222,8 +242,9 @@ for (geographyLevel in c("county", "place")){
     print(fortunes::fortune())
   } else{
     
+    placeDf <- sf::read_sf(placeFileName) |> as_tibble() |>  select(GEOID,area) |> mutate(GEOID=as.numeric(GEOID))
     censusDF <- loadIfExists(interimDataFileName)
-    censusDF |> 
+    censusDF <- censusDF |> 
       mutate(
         year = censusYear,
         NAME = str_remove(NAME, ", Tennessee"),
@@ -242,10 +263,18 @@ for (geographyLevel in c("county", "place")){
               
       ) |> 
       filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDD) |>
-      group_by(NAME,concept,cleanedLabel,year) |> 
+      group_by(GEOID,NAME,concept,cleanedLabel,year) |> 
       summarize(value=sum(value)) |> 
-      # filter(NAME=="Anderson County")
-      write_csv(fileName)
+      ungroup()
+      
+    censusDF |> 
+        filter(concept=="RACE",cleanedLabel=="Total") |> 
+        left_join(placeDf, by="GEOID") |> 
+        mutate(populationDensity=value/area, concept="Area") |> 
+        select(-cleanedLabel,-value) |> 
+        pivot_longer(cols=area:populationDensity,values_to = "value",names_to = "cleanedLabel") |>
+        rows_append(censusDF) |> 
+        write_csv(fileName)
     
     # censusDF |> select(concept, label) |> distinct() |> print(n=100)
     # censusDF |> filter(NAME=="Anderson County, Tennessee")

@@ -7,6 +7,7 @@ if (exists("startrun")) {
 
 
 # || Variables
+options(tigris_use_cache = TRUE)
 reset <- FALSE
 
 state <- "tn"
@@ -30,6 +31,24 @@ countiesInETDD <- c(
   "Union County"
 )
 
+countiesInETDDNameOnly <- c(
+  "Anderson",
+  "Blount",
+  "Campbell",
+  "Claiborne",
+  "Cocke",
+  "Grainger",
+  "Hamblen",
+  "Jefferson",
+  "Knox",
+  "Loudon",
+  "Monroe",
+  "Morgan",
+  "Roane",
+  "Scott",
+  "Sevier",
+  "Union"
+)
 
 
 municipalitiesInAnderson <- c(
@@ -187,7 +206,7 @@ acsYears <- c(2010, 2020)
 # || Functions
 
 # ||| Getting
-getCensusData <- function(censusYear, state, vars, fileName, surveyName, geographyLevel){
+getCensusData <- function(censusYear, state, vars, fileName, surveyName, geographyLevel, getShapeFile = FALSE){
   varFromAPI <- load_variables(censusYear, dataset=surveyName, cache=TRUE)
   APIVars <- 
     c(
@@ -203,6 +222,7 @@ getCensusData <- function(censusYear, state, vars, fileName, surveyName, geograp
     output = "tidy",
     state = state,
     cache_table = TRUE,
+    geometry=getShapeFile,
     # county = countyName,
     # key = keyring::key_get("CensusApi"),
     survey = surveyName,

@@ -80,6 +80,34 @@ for (geographyLevel in c("county", "place")){
 
   }
 
+# || Getting tigerfiles
+
+censusYear <- 2020
+fileName <- here::here("data","interim",str_c("tigerFiles",as.character(censusYear),"place.gpkg"))
+
+if (file.exists(fileName) & !reset){
+  print(fortunes::fortune())
+} else{
+  
+geographyLevel <- "place"
+fileName <- here::here("data","interim",str_c("tigerFiles",as.character(censusYear),geographyLevel,".gpkg"))
+
+  tigris::places(
+    state=state,
+    year=2020
+  ) |> 
+    sf::write_sf(fileName)
+  
+  geographyLevel <- "county"
+  fileName <- here::here("data","interim",str_c("tigerFiles",as.character(censusYear),geographyLevel,".gpkg"))
+  
+  tigris::counties(
+    state=state,
+    year=2020
+  )|> 
+    sf::write_sf(fileName)
+
+}
 
 if (file.exists(here::here("data","interim","lehdr_tn_od_main_JT00_2020.csv")) & !reset) {
   print(fortunes::fortune())
