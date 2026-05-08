@@ -208,11 +208,9 @@ if(FALSE){
       ~ "Other",
       .default=cleanedLabel
     )) |>
-    
-
     filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDD) |> 
- 
-    group_by(NAME,concept,cleanedLabel,year) |> 
+    group_by(NAME,concept,cleanedLabel,year)|>
+    summarize(estimate=sum(estimate))|> 
 
     write_csv(fileName)
   
