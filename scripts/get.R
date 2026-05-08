@@ -94,7 +94,7 @@ fileName <- here::here("data","interim",str_c("tigerFiles",as.character(censusYe
 
   tigris::places(
     state=state,
-    year=2020
+    year=censusYear
   ) |> 
     sf::write_sf(fileName)
   
@@ -103,7 +103,7 @@ fileName <- here::here("data","interim",str_c("tigerFiles",as.character(censusYe
   
   tigris::counties(
     state=state,
-    year=2020
+    year=censusYear
   )|> 
     sf::write_sf(fileName)
 
