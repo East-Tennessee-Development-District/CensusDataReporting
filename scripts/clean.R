@@ -196,6 +196,16 @@ if(FALSE){
         (str_detect(cleanedLabel, "Other services")
         )
       ~ str_c("Other: ",cleanedLabel),
+      # This is to handle values that appear to be repeated in 2010
+      concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
+        # !str_detect(label, "([\\w\\s\\,]*:){2,}") &
+        (str_detect(cleanedLabel, "Management") |
+           str_detect(cleanedLabel, "Natural resources") |
+           str_detect(cleanedLabel, "Production") |
+           str_detect(cleanedLabel, "Sales")|
+           str_detect(cleanedLabel, "Service")
+        )
+      ~ "Other",
       .default=cleanedLabel
     )) |>
     
