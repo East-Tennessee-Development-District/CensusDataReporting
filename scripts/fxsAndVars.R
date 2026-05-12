@@ -9,11 +9,14 @@ if (exists("startrun")) {
 # || Variables
 options(tigris_use_cache = TRUE)
 reset <- FALSE
-
 numberOfTopCounties <- 5
 state <- "tn"
 
+cityTownRegex <- "(CDP)?(city)?(town)?"
+cityTownTNRegex <- str_c("\\s?",cityTownRegex,"\\s?, TN")
+
 currReportYear <- 2020
+
 countiesInETDD <- c(
   "Anderson County",
   "Blount County",
