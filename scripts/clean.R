@@ -17,12 +17,11 @@ if (exists("fxsVars")) {
 
 # Place Files
 censusYear <- 2020
-for (geoLevel in c("county","place")){
+for (geographyLevel in c("county","place")){
   fileName <- here::here("data","interim",str_c("tigerFiles",as.character(censusYear),geographyLevel,".gpkg"))
   fileNameToWrite <- here::here("data","clean",str_c("tigerFiles",as.character(censusYear),geographyLevel,".gpkg"))
   
-  sfDf <- sf::read_sf(fileName) #|> 
-    # filter(NAME %in% countiesInETDDNameOnly | NAME %in% municipalitiesInETDD) 
+  sfDf <- loadSfIfExists((fileName) )
   sfDf |> 
     mutate(area=(((sf::st_area(sfDf) * 10.7639)/27878400) )) |> 
     select(GEOID, NAME, area) |> 

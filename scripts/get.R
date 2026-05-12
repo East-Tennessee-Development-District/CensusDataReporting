@@ -147,8 +147,11 @@ if (file.exists(here::here("data","interim","lehdr_tn_wac_main_JT00_2020.csv")))
                                   state_part="main",
                                   download_dir=here::here("data","raw","lehdr"),
                                   use_cache=TRUE
-      ) |> 
-        mutate(w_geocode=as.character(w_geocode))
+      ) 
+      if("w_geocode" %in% colnames(tempDF)){
+        tempDF <- tempDF |> mutate(w_geocode=as.character(w_geocode))
+      }
+      
       filename <-  str_c("lehdr_tn_",type,"_main_JT00_",as.character(year),".csv")
       write_csv(tempDF, here::here('data', "interim",filename))
     }

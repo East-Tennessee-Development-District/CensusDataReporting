@@ -292,6 +292,15 @@ loadIfExists <- function(fileName){
   
 }
 
+loadSfIfExists <- function(fileName){
+  
+  if(!file.exists(fileName)){
+    source(here::here("scripts","get.R"))
+  }
+  return(sf::read_sf(fileName))
+  
+}
+
 
 
 # || Final
