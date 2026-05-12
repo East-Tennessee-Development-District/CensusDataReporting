@@ -55,8 +55,8 @@ municipalitiesInAnderson <- c(
   "Clinton city",
   "Norris city",
   "Oak Ridge city",
-  "Oliver Springs",
-  "Rocky Top"
+  "Oliver Springs town",
+  "Rocky Top city"
 )
 municipalitiesInBlount <- c(
   "Alcoa city",
@@ -109,47 +109,47 @@ municipalitiesInKnox <- c(
 )
 municipalitiesInLoudon <- c( 
   "Greenback city",
-  "Loudon town",
+  "Loudon city",
   "Philadelphia city",
   "Lenoir City city"
   
   )
 municipalitiesInMonroe <- c( 
   "Madisonville city",
-  "Sweetwater",
-  "Vonore",
-  "Tellico Plains"
+  "Sweetwater city",
+  "Vonore town",
+  "Tellico Plains town"
 
   )
 municipalitiesInMorgan <- c(
-  "Oakdale",
-  "Sunbright",
-  "Wartburg"
+  "Oakdale town",
+  "Sunbright city",
+  "Wartburg city"
   
   )
 municipalitiesInRoane <- c( 
-  "Harriman",
-  "Kingston",
+  "Harriman city",
+  "Kingston city",
   "Rockwood city"
   
   )
 municipalitiesInScott <- c( 
-  "Huntsville",
-  "Oneida",
-  "Winfield"
+  "Huntsville town",
+  "Oneida town",
+  "Winfield town"
   
   )
 municipalitiesInSevier <- c(
-  "Pigeon Forge",
-  "Pittman Center",
-  "Gatlinburg",
-  "Sevierville"
+  "Pigeon Forge city",
+  "Pittman Center town",
+  "Gatlinburg city",
+  "Sevierville city"
   
 )
 municipalitiesInUnion <- c(
-  "Luttrell",
-  "Maynardville",
-  "Plainview"
+  "Luttrell town",
+  "Maynardville city",
+  "Plainview city"
 )
 
 
@@ -172,6 +172,41 @@ municipalitiesInETDD <- c(
   municipalitiesInSevier,
   municipalitiesInUnion
 )
+
+
+fuzzyMatchNames <- function(currNamesDf,canonDf,nameVar, numResponse=1){
+  currNamesMissing <- anti_join(currETDDNames,acsNames) 
+  canonNamesNotAssigned <- anti_join(acsNames,currETDDNames)
+  nameMatches <-  stringdist_join(currNamesMissing, canonNamesNotAssigned, 
+                  by = nameVar,
+                  mode = "left",
+                  ignore_case = TRUE, 
+                  method = "jw", 
+                  max_dist = 99, 
+                  distance_col = "dist") %>%
+    group_by(.data[[paste0(nameVar,".x")]]) %>%
+    slice_min(order_by = dist, n =  numResponse)
+  return(nameMatches)
+}
+
+if(FALSE){
+  # This is an example of how to use this function to fix the names, included for future years
+  acsNames <- read_csv(here::here("data","interim","acsData2020place.csv")) |> 
+    select(NAME) |> 
+    mutate(NAME=str_remove(NAME,", Tennessee")) |>
+    distinct()
+  
+  currETDDNames <- data.frame(NAME=municipalitiesInETDD)
+  
+  fuzzyMatchNames(acsNames,currETDDNames,"NAME") |> 
+    mutate(ending=str_extract(NAME.y,"(city)|(town)")) |> 
+    arrange(desc(ending)) |> 
+    print(n=50)
+}
+
+
+
+
 
 # tmpdf <- data.frame(NAME=municipalitiesInETDD)
 # tmpdff <- read_csv(here::here("data","interim",str_c("censusData",as.character(2020),"place",".csv")))

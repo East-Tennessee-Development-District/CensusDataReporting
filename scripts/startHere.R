@@ -7,7 +7,7 @@ for (pkg in RequiredPackages) {
 
 library(tidyverse)
 library(lehdr)
-
+library(fuzzyjoin)
 library(beepr)
 # This is for good luck
 library(fortunes)
