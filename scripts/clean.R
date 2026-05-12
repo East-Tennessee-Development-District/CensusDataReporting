@@ -206,8 +206,12 @@ if(FALSE){
            str_detect(cleanedLabel, "Service")
         )
       ~ "Other",
-      .default=cleanedLabel
-    )) |>
+      .default=cleanedLabel),
+      cleanedLabel= case_when(
+        concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" 
+        ~ str_to_title(cleanedLabel),
+      .default=cleanedLabel)
+    ) |>
     filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDD) |> 
     group_by(NAME,concept,cleanedLabel,year)|>
     summarize(estimate=sum(estimate))|> 
