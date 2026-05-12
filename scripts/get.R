@@ -37,7 +37,7 @@ if(TRUE){}else{
 }
 # || Getting ACS data
 for (geographyLevel in c("county", "place")){
-  for (acsYear in c(2010,2020)){
+  for (acsYear in acsYears){
 fileName <- here::here("data","interim",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
 subFileName <- here::here("data","interim",str_c("acsDataSubject",as.character(acsYear),geographyLevel,".csv"))
 surveyName <- "acs5"
