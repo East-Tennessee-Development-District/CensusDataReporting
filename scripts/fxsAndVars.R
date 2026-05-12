@@ -10,6 +10,7 @@ if (exists("startrun")) {
 options(tigris_use_cache = TRUE)
 reset <- FALSE
 
+numberOfTopCounties <- 5
 state <- "tn"
 
 currReportYear <- 2020

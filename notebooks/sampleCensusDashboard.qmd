@@ -37,18 +37,106 @@ source(here::here("scripts","defineColors.R"))
 currentCounty <- "Anderson"
 currentMunicipalities <- municipalitiesInAnderson
 
-if (file.exists(here::here("data","clean","ods2010.csv"))) {
- empData2010 <- read_csv(here::here("data","clean","ods2010.csv")) |> filter(workCountyName == currentCounty)
-} else {
-  source(here::here("scripts", "clean.R"))
-  empData2010 <- read_csv(here::here("data","clean","ods2010.csv"))  |> filter(workCountyName == currentCounty)
 }
 
+if (file.exists(here::here("data","clean","odsCombined.csv")) & !refreshData) {
+ empData2010 <- read_csv(here::here("data","clean","odsCombined.csv")) |> 
+   filter(workCountyName == currentCounty | homeCountyName == currentCounty) |>
+   select(-workPlaceName,-homePlaceName) |> 
+   filter(!is.na(numberOfJobs))
+
+ } else {
+   
+   source(here::here("scripts", "clean.R"))
+   empData2010 <- read_csv(here::here("data","clean","odsCombined.csv"))  |>
+    filter(workCountyName == currentCounty  | homeCountyName == currentCounty) |>
+    filter(!is.na(numberOfJobs))
+
+ }
+totalWorkJobs <- empData2010 |> 
+  filter(workCountyName == currentCounty) |> 
+  select(numberOfJobs) |> 
+  summarize(sum(numberOfJobs)) |> 
+  pull()
+totalHomeJobs <- empData2010 |> 
+  filter(workCountyName == currentCounty) |> 
+  select(numberOfJobs) |> 
+  summarize(sum(numberOfJobs)) |> 
+  pull()
+
+topWorkCounties <- empData2010 |> 
+  filter(workCountyName == currentCounty, year == currReportYear) |> 
+  group_by(homeCountyName) |>
+  summarize(numberOfJobs=sum(numberOfJobs)) |> 
+  arrange(desc(numberOfJobs)) |> 
+  top_n(numberOfTopCounties) |> 
+  select(homeCountyName) |> 
+  pull()
+
+topHomeCounties <- empData2010 |> 
+  filter(homeCountyName == currentCounty, year == currReportYear) |> 
+  group_by(workCountyName) |>
+  summarize(numberOfJobs=sum(numberOfJobs)) |> 
+  arrange(desc(numberOfJobs)) |> 
+  top_n(numberOfTopCounties) |> 
+  select(workCountyName) |> 
+  pull()
+
+topOverallCounties <- empData2010 |> 
+  pivot_longer(cols=c(-numberOfJobs,-year),values_to = "county") |> 
+  group_by(county) |> 
+  summarize(numberOfJobs=sum(numberOfJobs)) |> 
+  arrange(desc(numberOfJobs)) |> 
+  top_n(numberOfTopCounties) |> 
+  select(county) |> 
+  pull()
+
+topCounties <- unique(c(topWorkCounties,topHomeCounties))
+
+empDataWorkSubset <- empData2010 |> 
+  filter(workCountyName == currentCounty) |> 
+  mutate(
+    homeCountyName=ifelse(homeCountyName %in% topHomeCounties, homeCountyName, "All Other Locations"),
+    ) |> 
+  group_by(homeCountyName,year) |> 
+  summarize(
+    numberOfJobs=sum(numberOfJobs),
+    percentageOfJobs=numberOfJobs/totalWorkJobs
+    ) |> 
+  ungroup() |> 
+  mutate(isNotOther = ifelse(homeCountyName == "All Other Locations",0,1)) |> 
+  arrange(desc(isNotOther),desc(numberOfJobs) ) |> 
+    select(-isNotOther)
+  
+empDataHomeSubset <- empData2010 |> 
+  filter(homeCountyName == currentCounty) |> 
+  mutate(
+    workCountyName=ifelse(workCountyName %in% topWorkCounties, workCountyName, "All Other Locations"),
+    ) |> 
+  group_by(workCountyName,year) |> 
+  summarize(
+    numberOfJobs=sum(numberOfJobs),
+    percentageOfJobs=numberOfJobs/totalHomeJobs
+    ) |> 
+  ungroup() |> 
+  mutate(isNotOther = ifelse(workCountyName == "All Other Locations",0,1)) |> 
+  arrange(desc(isNotOther),desc(numberOfJobs) ) |> 
+    select(-isNotOther)
+
+totalWork <- empDataWorkSubset %>% 
+      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE))) %>% 
+      mutate(homeCountyName = "Total",year=NA)
+  
+totalHome <- empDataHomeSubset %>% 
+      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE))) %>% 
+      mutate(workCountyName = "Total",year=NA)
+ 
+
 if (file.exists(here::here("data","clean","acsDataCombined.csv"))) {
- acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
+ acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County")) 
 } else {
   source(here::here("scripts", "clean.R"))
-  acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
+  acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County")) 
 }
 if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
  censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
@@ -56,9 +144,6 @@ if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
   source(here::here("scripts", "clean.R"))
   censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
 }
-
-
-
 
 
 ```
