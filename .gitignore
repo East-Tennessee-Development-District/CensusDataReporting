@@ -1,3 +1,6 @@
+# census api file
+scripts/secrets.R
+
 # History files
 .Rhistory
 .Rapp.history
@@ -47,3 +50,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# random win files
+desktop.ini

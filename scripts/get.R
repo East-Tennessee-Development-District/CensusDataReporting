@@ -8,6 +8,10 @@ if (exists("fxsVars")) {
 } else {
   source(here::here("scripts","fxsAndVars.R"))
 }
+if (file.exists(here::here("scripts","secrets.R")) &
+                !Sys.getenv("CENSUS_API_KEY") != ""){
+  source(here::here("scripts","secrets.R"))
+}
 
 
 
