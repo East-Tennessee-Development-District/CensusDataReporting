@@ -186,6 +186,7 @@ and poverty status of families;
 
 ```{r}
 #| title: Population and Growth
+#| label: pop
 
 censusDf |> filter(concept == "RACE", cleanedLabel=="Total") |> 
   ggplot(aes(x=year, y=value, color=NAME))+
@@ -196,6 +197,7 @@ censusDf |> filter(concept == "RACE", cleanedLabel=="Total") |>
 
 ```{r}
 #| title: Population Density
+#| label: popDensity
 
 placesShapeFile <- sf::read_sf(here::here("data","clean","tigerFiles2020place.gpkg"))
 countiesShapeFile <- sf::read_sf(here::here("data","clean","tigerFiles2020county.gpkg"))
@@ -237,6 +239,7 @@ censusDf |> filter(cleanedLabel=="area" | cleanedLabel == "populationDensity") |
 
 ```{r}
 #| title: Population Descriptions
+#| label: popDesc
 
 censusDf |> 
   filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel)) |> 
@@ -332,6 +335,8 @@ censusDf |> filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel
 ```
 
 ```{r}
+#| title: Education
+#| label: edu
 
 totalOfEducation <- acsDf |> 
      filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER" & cleanedLabel == "Total") |> pull()
@@ -366,6 +371,7 @@ acsDf |>
 ```
 ```{r}
 #| title: Housing Units by Year of Construction
+#| label: constYear
 
 tmpDf <- acsDf |> filter(concept == "YEAR STRUCTURE BUILT") |> 
   pivot_wider(
@@ -415,6 +421,7 @@ ggplot(aes(x = NAME,
 
 ```{r}
 #| title: Housing Units by Type of Tenure
+#| label: tenureType
 
 tmpDf <- acsDf |> filter(concept == "TENURE") |> 
   pivot_wider(
@@ -450,6 +457,8 @@ acsDf |> filter(concept == "TENURE") |>
 
 
 ```{r}
+#| title: Income comparison
+#| label: income
 
 acsDf |> 
   filter(concept == "PER CAPITA INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)") |> 
@@ -493,6 +502,8 @@ acsDf |>
 ```
 
 ```{r}
+#| title: Poverty Status
+#| label: poverty
 acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel == "Above Poverty" | cleanedLabel == "Below Poverty") |> 
   select(NAME,cleanedLabel,year,estimate) |> 
   pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
@@ -524,6 +535,7 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
 
 ```{r}
 #| title: Poverty Status by Family Type
+#| label: povertyFamily
 
 # All Families, Families Headed by Females, Headed by Female with Related Children under 18
 acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel != "Other", cleanedLabel != "Total") |> 
@@ -578,6 +590,7 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
 
 ```{r}
 #| title: Employment by Industry
+#| label: emp
 
 acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
   mutate(cleanedLabel = str_remove(cleanedLabel,"([\\w\\s\\,]*:)")) |> 
@@ -617,6 +630,7 @@ acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED PO
 
 ```{r}
 #| title: Employment by Industry (Historical)
+#| label: empHist
 
 acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
   mutate(cleanedLabel = str_remove(cleanedLabel,"(:[\\w\\s,&]*)")) |> 
@@ -646,6 +660,7 @@ DT::datatable(
 
 ```{r}
 #| title: Labor Force by Place of Work
+#| label: placeWork
 
 acsDf |> 
   filter(concept=="MEANS OF TRANSPORTATION TO WORK BY PLACE OF WORK--STATE AND COUNTY LEVEL", cleanedLabel!="Other", cleanedLabel !="Total") |>
@@ -682,6 +697,7 @@ acsDf |> filter(concept=="MEANS OF TRANSPORTATION TO WORK BY PLACE OF WORK--STAT
 
 ```{r}
 #| title: Commuting Patterns
+#| label: commuting
 
 pctVars <- c("percentageOfJobs")
 pctWholeVars <- c("")
