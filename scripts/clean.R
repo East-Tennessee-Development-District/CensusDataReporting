@@ -85,7 +85,7 @@ if(FALSE){
         ~ "Below Poverty: Female Householder with related children",
         concept == "POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN" &
           label == "EstimateTotal:Income in the past 12 months at or above poverty level:Other family:Female householder, no spouse present:With related children of the householder under 18 years:"
-        ~ "Above Poverty: Female Household with related children",
+        ~ "Above Poverty: Female Householder with related children",
         str_detect(concept,"PER CAPITA INCOME IN THE PAST 12 MONTHS") &
           ! str_detect(concept, "ALONE") & !str_detect(concept,"HISPANIC") & 
           !str_detect(concept,"TWO")
