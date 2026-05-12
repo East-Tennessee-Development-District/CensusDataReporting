@@ -179,16 +179,22 @@ municipalitiesInETDD <- c(
 )
 
 
+censusYears <- c(2010, 2020)
+acsYears <- c(2010, 2020)
+
+# || Functions
+
+# ||| Dev
 fuzzyMatchNames <- function(currNamesDf,canonDf,nameVar, numResponse=1){
   currNamesMissing <- anti_join(currETDDNames,acsNames) 
   canonNamesNotAssigned <- anti_join(acsNames,currETDDNames)
-  nameMatches <-  stringdist_join(currNamesMissing, canonNamesNotAssigned, 
-                  by = nameVar,
-                  mode = "left",
-                  ignore_case = TRUE, 
-                  method = "jw", 
-                  max_dist = 99, 
-                  distance_col = "dist") %>%
+  nameMatches <-  fuzzyjoin::stringdist_join(currNamesMissing, canonNamesNotAssigned, 
+                                  by = nameVar,
+                                  mode = "left",
+                                  ignore_case = TRUE, 
+                                  method = "jw", 
+                                  max_dist = 99, 
+                                  distance_col = "dist") %>%
     group_by(.data[[paste0(nameVar,".x")]]) %>%
     slice_min(order_by = dist, n =  numResponse)
   return(nameMatches)
@@ -208,42 +214,6 @@ if(FALSE){
     arrange(desc(ending)) |> 
     print(n=50)
 }
-
-
-
-
-
-# tmpdf <- data.frame(NAME=municipalitiesInETDD)
-# tmpdff <- read_csv(here::here("data","interim",str_c("censusData",as.character(2020),"place",".csv")))
-# tmpdffcounty <- read_csv(here::here("data","interim",str_c("censusData",as.character(2020),"county",".csv")))
-# tmpdffcounty |> select(NAME,GEOID) |> distinct() |> 
-#   filter(NAME=="Anderson County, Tennessee")
-# 
-# testingGeoID <- tmpdffcounty |> select(NAME,GEOID) |> distinct() |> 
-#   filter(NAME=="Anderson County, Tennessee") |> pull()
-# 
-# tmpdff |> 
-#   filter(str_detect(GEOID, as.character(testingGeoID))) |> select(GEOID,NAME) |> distinct()
-# 
-# fuzzyjoin::stringdist_join(tmpdf, tmpdff, 
-#                            by = "NAME",
-#                            mode = "left",
-#                            ignore_case = TRUE, 
-#                            method = "jw", 
-#                            max_dist = 99, 
-#                            distance_col = "dist") %>%
-#   group_by(NAME.x) %>%
-#   slice_min(order_by = dist, n = 1) |> 
-#   select(NAME.y, NAME.x, GEOID) |> 
-#   distinct() |> 
-#   print(n=50)
-
-
-censusYears <- c(2010, 2020)
-acsYears <- c(2010, 2020)
-
-
-# || Functions
 
 # ||| Getting
 getCensusData <- function(censusYear, state, vars, fileName, surveyName, geographyLevel, getShapeFile = FALSE){
