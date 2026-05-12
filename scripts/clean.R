@@ -320,8 +320,11 @@ if(file.exists(fileName) & !reset){print(fortunes::fortune())} else {
 lehdCrossWalk <- loadIfExists((here::here("data","interim","lehdrBlockConverison.csv"))) |> 
   mutate(w_geocode=as.character(tabblk2020)) |> 
   select(-tabblk2020)
+if (exists("combinedOdsDf")){
+  rm(combinedOdsDf)
+}
 for (year in (c(2010,2020))) {
-  loadIfExists(here::here("data","interim",str_c("lehdr_tn_od_main_JT00_",year,".csv"))) |> 
+  currOds <- loadIfExists(here::here("data","interim",str_c("lehdr_tn_od_main_JT00_",year,".csv"))) |> 
     # select(w_geocode, C000) |> 
     mutate(w_geocode=as.character(w_geocode),
            h_geocode=as.character(h_geocode)) |> 
@@ -329,18 +332,33 @@ for (year in (c(2010,2020))) {
       lehdCrossWalk,
       by = join_by(w_geocode==w_geocode)
     ) |> 
-    mutate(workCountyName=str_remove(ctyname," County, TN")) |> 
-    select(workCountyName, h_geocode, S000) |> 
+    mutate(workCountyName=str_remove(ctyname," County, TN"),
+           workPlaceName=str_remove(stplcname,cityTownTNRegex)) |> 
+    select(workCountyName,workPlaceName, h_geocode, S000) |> 
     right_join(
       lehdCrossWalk,
       by = join_by(h_geocode==w_geocode)
     ) |> 
-    mutate(homeCountyName=str_remove(ctyname," County, TN")) |> 
-    group_by(workCountyName, homeCountyName) |> 
-    summarize(numberOfJobs=sum(S000)) |> 
+    mutate(homeCountyName=str_remove(ctyname," County, TN"),
+           homePlaceName=str_remove(stplcname,cityTownTNRegex),
+           year=year) |> 
+    group_by(workCountyName, homeCountyName, workPlaceName, homePlaceName, year) |> 
+    summarize(numberOfJobs=sum(S000)) 
+  currOds |> 
     write_csv(here::here("data","clean",str_c("ods",year,".csv")))
   
+      if(exists("combinedOdsDf")){
+        combinedOdsDf <- combinedOdsDf |> 
+          rbind(currOds)
+        
+      } else {
+        combinedOdsDf <- currOds
+        
+      }
   
-  }
+}
+fileName <- here::here("data","clean","odsCombined.csv")
 
+combinedOdsDf |> 
+  write_csv(fileName)
 

@@ -12,6 +12,7 @@ reset <- FALSE
 
 state <- "tn"
 
+currReportYear <- 2020
 countiesInETDD <- c(
   "Anderson County",
   "Blount County",
