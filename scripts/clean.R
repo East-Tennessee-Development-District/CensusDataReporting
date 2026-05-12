@@ -223,7 +223,9 @@ if(FALSE){
 }
 
 fileName <- here::here("data","clean","acsDataCombined.csv")
-rm(combinedAcsDf)
+if (exists("combinedAcsDf")){
+  rm(combinedAcsDf)
+}
 if(file.exists(fileName) & !reset){print(fortunes::fortune())} else {
   
   for (geographyLevel in c("county", "place")){
@@ -294,6 +296,9 @@ for (geographyLevel in c("county", "place")){
 
 fileName <- here::here("data","clean","censusDataCombined.csv")
 
+if (exists("combinedCensusDf")){
+  rm(combinedCensusDf)
+}
 if(file.exists(fileName) & !reset){print(fortunes::fortune())} else {
 
   for (geographyLevel in c("county", "place")){
