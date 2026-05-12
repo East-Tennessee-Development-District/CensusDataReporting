@@ -455,6 +455,7 @@ acsDf |> filter(concept == "TENURE") |>
     geom_bar(position = position_dodge(preserve = "single"),stat="identity")
 ```
 
+### Economics{.tabset}
 
 ```{r}
 #| title: Income comparison
