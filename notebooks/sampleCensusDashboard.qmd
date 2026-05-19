@@ -134,16 +134,16 @@ totalHome <- empDataHomeSubset %>%
  
 
 if (file.exists(here::here("data","clean","acsDataCombined.csv"))) {
- acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County")) 
+ acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
 } else {
   source(here::here("scripts", "clean.R"))
-  acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County")) 
+  acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
 }
 if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
- censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
+ censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County"))
 } else {
   source(here::here("scripts", "clean.R"))
-  censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% currentMunicipalities | NAME == str_c(currentCounty," County"))
+  censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County"))
 }
 
 
