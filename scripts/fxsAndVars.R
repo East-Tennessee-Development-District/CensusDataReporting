@@ -10,6 +10,7 @@ if (exists("startrun")) {
 options(tigris_use_cache = TRUE)
 reset <- FALSE
 numberOfTopCounties <- 5
+numberOfTopIndustries <- 5
 state <- "tn"
 
 cityTownRegex <- "(CDP)?(city)?(town)?"

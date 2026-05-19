@@ -8,6 +8,10 @@ table.dataTable tr.even{
   ;
 }
 
+table.dataTable thead th {
+      background-color: #015a71 !important;
+      color: white !important;
+    }
 .quarto-title-block .quarto-title-banner {
   background-image: url(etddLogo.png);
   background-size: 300px;

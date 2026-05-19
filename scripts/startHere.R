@@ -8,6 +8,8 @@ for (pkg in RequiredPackages) {
 library(tidyverse)
 library(lehdr)
 library(beepr)
+library(patchwork)
+library(scales)
 # This is for good luck
 library(fortunes)
 # Api calls

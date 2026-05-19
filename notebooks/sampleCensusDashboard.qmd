@@ -6,6 +6,7 @@ logo:
     medium: ../resources/ETDDLogo.svg
 format: 
   dashboard: 
+      orientation: rows
       css: ../resources/oddHighlight.css
       theme: 
         light: flatly
@@ -21,8 +22,8 @@ params:
 
 ```{r initializing}
 #| include: false
-#| cache: true
 
+refreshData <- params$refreshdata
 if (exists("startrun")) {
   print(fortunes::fortune())
 } else {
@@ -146,7 +147,31 @@ if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
   censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County"))
 }
 
-
+theme_set(theme_classic())
+scale_colour_discrete <- scale_colour_viridis_d
+options(ggplot2.continuous.colour="mako")
+options(ggplot2.continuous.fill = "mako")
+options(ggplot2.discrete.colour = "mako_d")
+options(ggplot2.discrete.fill = "mako_d")
+options(ggplot2.ordinal.colour = "mako")
+options(ggplot2.ordinal.fill = "mako")
+scale_fill_discrete <- function(...) {
+   #scale_fill_manual(..., values = viridis_qualitative_pal7)
+  viridis::scale_fill_viridis(discrete = TRUE, option="G")
+} 
+options(DT.options = list(filter="top",
+    extensions = c('Buttons', 
+     'FixedHeader'),
+    options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'print'),
+    scrollX = TRUE,
+   fixedHeader=TRUE,
+  initComplete = DT::JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
+    "}")
+    )))
 ```
 
 # Overview
@@ -161,7 +186,7 @@ if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
 
 # Anderson
 
-## Row {.tabset}
+## Column {.tabset}
 ### Description
 
 PUT MAP HERE
@@ -183,7 +208,9 @@ and poverty status of families;
 • educational level of the adult population;
 • and housing characteristics in terms of age of the housing stock and type of tenure.
 
-### Demographics{.tabset}
+### Demographics {.tabset}
+
+#### Population and Growth {.columns}
 
 ```{r}
 #| title: Population and Growth
@@ -191,14 +218,14 @@ and poverty status of families;
 
 censusDf |> filter(concept == "RACE", cleanedLabel=="Total") |> 
   ggplot(aes(x=year, y=value, color=NAME))+
-  geom_point()
+  geom_line()
 
 ```
 
-
+#### Population Density 
+:::: {.columns}
 ```{r}
-#| title: Population Density
-#| label: popDensity
+#| label: popDensityFig
 
 placesShapeFile <- sf::read_sf(here::here("data","clean","tigerFiles2020place.gpkg"))
 countiesShapeFile <- sf::read_sf(here::here("data","clean","tigerFiles2020county.gpkg"))
@@ -211,25 +238,25 @@ countiesShapeFile <- sf::read_sf(here::here("data","clean","tigerFiles2020county
 
 censusDf |> filter(cleanedLabel == "populationDensity") |> 
   ggplot(aes(x=NAME,y=value, fill = NAME))+
-  geom_bar(stat='identity')
+  geom_bar(stat='identity')+
+  labs(y="Population Density",
+       x="",
+       caption = "Density is population/area(in square miles)")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
   
+
+```
+```{r}
+#| label: popDensityTable
 censusDf |> filter(cleanedLabel=="area" | cleanedLabel == "populationDensity") |> 
   pivot_wider(values_from = value, names_from = cleanedLabel) |> 
   select(-GEOID,-concept, -year) |> 
   DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
+    caption = "Density is population / area (in square miles)",
   colnames = c('Place' = 'NAME', 'Population Density' = 'populationDensity','Area'='area')
   ) |> 
   # DT::formatPercentage('Percentage of People', 0) |>
@@ -237,60 +264,72 @@ censusDf |> filter(cleanedLabel=="area" | cleanedLabel == "populationDensity") |
   DT::formatCurrency('Population Density', currency = "", digits=1)
 
 ```
+:::::
 
+#### Population Descriptions
+:::: {.columns}
+:::{.column}
 ```{r}
-#| title: Population Descriptions
-#| label: popDesc
+#| label: popDescRaceTable
 
-censusDf |> 
-  filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel)) |> 
-  select(NAME, cleanedLabel, value) |> 
-DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
-  colnames = c('Place' = 'NAME','Number of People' = 'value',
-               'Race Category' = 'cleanedLabel')
-  ) |> 
-  DT::formatCurrency('Number of People', currency = "", digits=0)
-
-acsDf |> 
+max_num <- acsDf |> 
   filter(concept=="AGE AND SEX") |> 
-  filter(str_detect(cleanedLabel,"Total population")) |> 
+  filter(str_detect(cleanedLabel,"Total population"), !str_detect(cleanedLabel,"TotalTotal")) |> 
+  select(estimate) |> 
+  slice_max(
+    order_by = estimate,
+    n = 1
+  ) |>
+  pull(estimate)
+
+popPyramidData <- acsDf |> filter(concept=="AGE AND SEX") |> filter(str_detect(cleanedLabel,"Total population")) |> 
   mutate(Sex = ifelse(str_detect(cleanedLabel,"Female"),"Female",
                       ifelse(str_detect(cleanedLabel,"Male"),"Male",NA)),
          AgeRange = str_remove(str_remove(str_remove(cleanedLabel, 
                                                      "FemaleTotal populationAGE"),
                                           "MaleTotal populationAGE"),
-                               "TotalTotal populationAGE")
+                               "TotalTotal populationAGE"),
+         estimate=ifelse(Sex == "Female", -estimate, estimate),
+         AgeRange=factor(AgeRange, levels=c("Under 5 years",
+                                               "5 to 9 years",
+                                               "10 to 14 years", 
+                                                "15 to 19 years",   
+                                                "20 to 24 years",   
+                                                "25 to 29 years",   
+                                                "30 to 34 years",   
+                                                "35 to 39 years",   
+                                                "40 to 44 years",   
+                                                "45 to 49 years",   
+                                                "50 to 54 years",   
+                                                "55 to 59 years",   
+                                                "60 to 64 years",   
+                                                "65 to 69 years",   
+                                                "70 to 74 years",   
+                                                "75 to 79 years",   
+                                                "80 to 84 years",   
+                                                "85 years and over"
+                                               ))
          ) |> 
-  filter(!is.na(AgeRange)) |> 
+    filter(!is.na(AgeRange), !is.na(Sex)) 
+
+
+censusDf |> 
+  filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel)) |> 
+  select(NAME, cleanedLabel, value) |> 
+DT::datatable(
+  colnames = c('Place' = 'NAME','Number of People' = 'value',
+               'Race Category' = 'cleanedLabel')
+  ) |> 
+  DT::formatCurrency('Number of People', currency = "", digits=0)
+```
+
+``` {r}
+#| label: popAgeTable
+ 
+popPyramidData |> 
   # pivot_wider(values_from = value, names_from = cleanedLabel) |> 
   select(NAME, Sex, AgeRange, year, estimate) |> 
   DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
   colnames = c('Place' = 'NAME', 'Age Range' = 'AgeRange','Year'='year', 
                'Number of People' = 'estimate')
   ) |> 
@@ -298,163 +337,119 @@ acsDf |>
   DT::formatCurrency('Number of People', currency = "", digits=0)
 # Sex
   
-acsDf |> filter(concept=="AGE AND SEX") |> filter(str_detect(cleanedLabel,"Total population")) |> 
-  mutate(Sex = ifelse(str_detect(cleanedLabel,"Female"),"Female",
-                      ifelse(str_detect(cleanedLabel,"Male"),"Male",NA)),
-         AgeRange = str_remove(str_remove(str_remove(cleanedLabel, 
-                                                     "FemaleTotal populationAGE"),
-                                          "MaleTotal populationAGE"),
-                               "TotalTotal populationAGE"),
-         estimate=ifelse(Sex == "Female", -estimate, estimate)
-         ) |> 
-    filter(!is.na(AgeRange), !is.na(Sex)) |> 
-  ggplot(
-    aes(
-      x = estimate,
-      y = AgeRange,
-      fill = Sex
-    )
-  ) +
-  geom_col() +
-  geom_label(
-    aes(
-      x = 0,
-      label = AgeRange
-    ),
-    fill = "white",
-    label.size = 0
+```
+
+```{r}
+#| label: popRaceGraph
+censusDf |> filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel)) |> 
+  ggplot(aes(x=cleanedLabel, y=value, fill=NAME))+
+  geom_bar(stat="identity",position="dodge")+
+  labs(
+    x="Racial Category",
+    y="Estimated Population",
+    fill="Place"
+  )+
+  scale_y_continuous(
+    labels = scales::comma,
+    breaks = breaks_pretty()
   )
 
+```
+
+``` {r}
+#| label: popPyramid
+population_pyramid_men <- popPyramidData |>
+  filter(Sex == "Male") |>
+  ggplot(aes(
+    x = estimate,
+    y = AgeRange,
+    fill=NAME
+  )) +
+  geom_col()+
+  annotate(
+    geom = "label",
+    x = 2*(max_num/3),
+    y = 17,
+    label = "Male",
+    fill = etddBlueDark,
+    color = "white",
+    label.padding = unit(0.3, "lines")
+  ) +
+  scale_x_continuous(
+    labels = scales::comma,
+    breaks = breaks_pretty(),
+    limits = c(0, max_num)
+  ) +
+  labs(x="",y="")+
+  theme(
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank(),
+    axis.text.x = element_text(),
+    axis.line.y= element_blank(),
+    panel.grid.major.x = element_line(color = "grey90")
+  )
+population_pyramid_women <-
+  popPyramidData |>
+  filter(Sex == "Female") |>
+  ggplot(aes(
+    x = estimate,
+    y = AgeRange,
+    fill = NAME
+  )) +
+  geom_col() +
+  annotate(
+    geom = "label",
+    x =  -(2*(max_num/3)),
+    y = 17,
+    label = "Female",
+    fill = etddGreen,
+    color = "grey30",
+    
+    label.padding = unit(0.3, "lines")
+  ) +
+  scale_x_continuous(
+    labels = function(x) scales::comma(abs(x)),
+    breaks = breaks_pretty(),
+    limits = c(-max_num, 0)
+  ) +
+  labs(x="",y="")+
+  theme(
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank(),
+    axis.text.x = element_text(),
+    axis.line.y= element_blank(),
+    panel.grid.major.x = element_line(color = "grey90")
+  )
+
+  age_labels_plot <-
+  popPyramidData |> 
+    select(AgeRange) |> distinct() |> 
+  ggplot(
+    aes(
+      x = 1,
+      y = AgeRange,
+      label = AgeRange
+    )
+  ) +
+  geom_text() +
+  theme_void()
+  
+  population_pyramid_women +
+  age_labels_plot +
+  population_pyramid_men +
+  plot_layout(
+    widths = c(7.5, 3.5, 7.5)
+  )
 # Race
-censusDf |> filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel)) |> 
-  ggplot(aes(x=cleanedLabel, y=value))+
-  geom_bar(stat="identity")
 
 # Age (use pyramid for this?)
 
 
 ```
+:::::
 
-```{r}
-#| title: Education
-#| label: edu
-
-totalOfEducation <- acsDf |> 
-     filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER" & cleanedLabel == "Total") |> pull()
-acsDf |> 
-     filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER"  & cleanedLabel != "Other") |> 
-  mutate(pctOfEstimate = estimate/totalOfEducation) |> 
-  select(-concept) |> 
-  DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
-  colnames = c('Place' = 'NAME', 'Level of Education' = 'cleanedLabel', 'Number of People' = 'estimate',
-               'Percentage of People' = 'pctOfEstimate')
-  ) |> 
-  DT::formatPercentage('Percentage of People', 0) |>
-  DT::formatCurrency('Number of People', currency = "", digits=0)
-
-acsDf |> 
-     filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER") |> 
-     ggplot(aes(x=cleanedLabel, y=estimate)) +
-     geom_bar(stat="identity")
-```
-```{r}
-#| title: Housing Units by Year of Construction
-#| label: constYear
-
-tmpDf <- acsDf |> filter(concept == "YEAR STRUCTURE BUILT") |> 
-  pivot_wider(
-    names_from = cleanedLabel,
-    values_from = estimate
-  ) |> 
-  select(-year, -concept)
-tmpDf |> 
-  DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
-  caption = "Housing Units by Year of Construction",
-  colnames = c('Place' = 'NAME')
-  ) |> 
-  DT::formatCurrency(which(sapply(tmpDf,is.numeric)), currency = "", digits=0)
-
-acsDf |> filter(concept == "YEAR STRUCTURE BUILT" & cleanedLabel != "Total") |> 
-  ggplot(aes(x=NAME, y=estimate, fill = cleanedLabel))+
-  geom_bar(stat = "identity")
-
-acsDf |> filter(concept == "YEAR STRUCTURE BUILT" &  cleanedLabel != "Total") |> 
-  ggplot(aes(x=NAME, y=estimate, fill = cleanedLabel))+
-  geom_bar(stat = "identity", position = "dodge")
-
-acsDf |> filter(concept == "YEAR STRUCTURE BUILT" &  cleanedLabel != "Total") |> 
-ggplot(aes(x = NAME,
-           fill = cleanedLabel, y = estimate)) + 
-  geom_bar(position = "fill", stat = "identity") +
-  scale_y_continuous(breaks = seq(0, 1, .2)) +
-  scale_fill_brewer(palette = "Set2") +
-  labs(y = "Percent", 
-       fill="Year Structure Built",
-       x = "Place",
-       title = "Year Structure Built by Place")
-```
-
-```{r}
-#| title: Housing Units by Type of Tenure
-#| label: tenureType
-
-tmpDf <- acsDf |> filter(concept == "TENURE") |> 
-  pivot_wider(
-    names_from = cleanedLabel,
-    values_from = estimate
-  ) |> 
-  select(-year, -concept)
-tmpDf |> 
-  DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
-  caption = "Housing Units by Tenure Status",
-  colnames = c('Place' = 'NAME')
-  ) |> 
-  DT::formatCurrency(which(sapply(tmpDf,is.numeric)), currency = "", digits=0)
-
-
-acsDf |> filter(concept == "TENURE") |> 
-  ggplot(aes(x=NAME, y= estimate, fill = cleanedLabel)) +
-    geom_bar(position = position_dodge(preserve = "single"),stat="identity")
-```
 
 ### Economics{.tabset}
 
@@ -466,19 +461,7 @@ acsDf |>
   filter(concept == "PER CAPITA INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)") |> 
   select(NAME,estimate,year) |> 
   DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
+    
   colnames = c('Place' = 'NAME', 'Year'='year', 
                'Income' = 'estimate')
   ) |> 
@@ -500,7 +483,11 @@ acsDf |>
         subtitle = "(Anderson County)") +
   theme_minimal() + 
   theme(panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
+        panel.grid.minor = element_blank())+
+   scale_x_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
 ```
 
 ```{r}
@@ -510,28 +497,24 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
   select(NAME,cleanedLabel,year,estimate) |> 
   pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
 DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
-  colnames = c('Place' = 'NAME', 'Year'='year')
+    colnames = c('Place' = 'NAME', 'Year'='year')
   ) |> 
   # DT::formatPercentage('Percentage of People', 0) |>
   DT::formatCurrency('Above Poverty', currency = "", digits=0) |> 
   DT::formatCurrency('Below Poverty', currency = "", digits=0)
 
-acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel != "Other") |> 
+acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel == "Above Poverty" | cleanedLabel == "Below Poverty") |> 
   ggplot(aes(x=NAME, y=estimate, fill=cleanedLabel))+
-  geom_bar(stat = "identity", position = "dodge")
+  geom_bar(stat = "identity", position = "dodge")+
+  labs(y="Estimated Number of Families",
+       x="",
+       fill="Poverty Status")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+  
 
 ```
 
@@ -556,19 +539,6 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
   relocate(year, .after = last_col()) |> 
   # pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
 DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
   colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Families'='estimate')
   ) |> 
   # DT::formatPercentage('Percentage of People', 0) |>
@@ -583,49 +553,63 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
            ~ "Female Householder with related children",
            str_detect(cleanedLabel,"Female Householder")
            ~ "Female Householder",
-           .default="All Families"
+           .default="All Other Families"
          )
   ) |> 
   ggplot(aes(x=`Poverty Status`,y=estimate,fill=`Family Type`))+
-  geom_bar(stat="identity", position="stack")
+  geom_bar(stat="identity", position="stack")+
+  labs(y="Estimated Number of Families",
+       x="",
+       fill="Family Type")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
 ```
 
 ```{r}
 #| title: Employment by Industry
 #| label: emp
 
-acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
-  mutate(cleanedLabel = str_remove(cleanedLabel,"([\\w\\s\\,]*:)")) |> 
+topIndustries <- acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total", year==currReportYear) |> 
+  mutate(cleanedLabel = str_remove(cleanedLabel,"([\\w\\s\\,&]*:\\s?)")) |> 
   select(-concept) |> 
+  group_by(cleanedLabel) |>
+  summarize(numberOfJobs=sum(estimate)) |> 
+  arrange(desc(numberOfJobs)) |> 
+  top_n(numberOfTopIndustries) |> 
+  select(cleanedLabel) |> 
+  pull()
+
+acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
+  mutate(cleanedLabel = str_remove(cleanedLabel,"([\\w\\s\\,&]*:\\s?)"),
+         cleanedLabel = ifelse(cleanedLabel %in% topIndustries, cleanedLabel, "Other Industries")) |> 
+  group_by(NAME,cleanedLabel,year) |> 
+  summarize(estimate=sum(estimate)) |> 
 DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
-  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate')
+  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate', 'Industry'='cleanedLabel')
   ) |> 
   DT::formatCurrency('Number of Jobs', currency='', digits=0)
 
 plotly::ggplotly(
-acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
-  ggplot(aes(x=estimate, y=NAME, color = cleanedLabel))+
-  geom_jitter()+
-  theme(legend.position = "none"))
-
-plotly::ggplotly(
-acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
-  ggplot(aes(x=estimate, y=NAME, fill = cleanedLabel))+
+acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total",year==currReportYear) |> 
+  mutate(cleanedLabel = str_remove(cleanedLabel,"([\\w\\s\\,&]*:\\s?)"),
+         cleanedLabel = ifelse(cleanedLabel %in% topIndustries, cleanedLabel, "Other Industries")) |> 
+  group_by(NAME,cleanedLabel,year) |> 
+  summarize(estimate=sum(estimate)) |> 
+  ggplot(aes(y=estimate, x=NAME, fill = cleanedLabel))+
   geom_bar(stat = "identity", position = "dodge")+
-  theme(legend.position = "none"))
+  theme(legend.position = "none")+
+  labs(y="Estimated Number of Workers",
+       x="Place",
+       fill="Type of Tenure")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+)
 
 ```
 
@@ -670,20 +654,7 @@ acsDf |>
   pivot_wider(values_from = estimate,names_from = cleanedLabel) |> 
   
 DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
-  colnames = c('Place' = 'NAME', 'Year'='year')
+    colnames = c('Place' = 'NAME', 'Year'='year')
   ) |> 
   DT::formatCurrency('Work Out Of State', currency='', digits=0) |> 
   DT::formatCurrency('Work Out of County of Residence', currency='', digits=0) |> 
@@ -692,7 +663,15 @@ DT::datatable(
 
 acsDf |> filter(concept=="MEANS OF TRANSPORTATION TO WORK BY PLACE OF WORK--STATE AND COUNTY LEVEL", cleanedLabel!="Other") |> 
   ggplot(aes(x=cleanedLabel,y=estimate,fill=cleanedLabel))+
-  geom_bar(stat="identity")
+  geom_bar(stat="identity")+
+  labs(y="Estimated Number of Workers",
+       x="",
+       fill="Place of Work")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
 
 ```
 
@@ -707,19 +686,6 @@ pctWholeVars <- c("")
 empDataWorkSubset |> 
   bind_rows(totalWork) |> 
  DT::datatable(
-    filter="top",
-    extensions = c('Buttons', 
-     'FixedHeader'),
-    options = list(
-    dom = 'Bfrtip',
-    buttons = c('copy', 'csv', 'excel', 'print'),
-    scrollX = TRUE,
-   fixedHeader=TRUE,
-  initComplete = DT::JS(
-    "function(settings, json) {",
-    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
-    "}")
-    ),
   caption = "Anderson County laborers by counties where laborers reside",
   colnames = c('Home County' = 'homeCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs')
   ) |> 
@@ -727,11 +693,16 @@ empDataWorkSubset |>
   DT::formatCurrency('Number of Jobs', currency = "", digits=0)
 
 (empDataWorkSubset |> 
+    filter(year==currReportYear) |> 
   ggplot(aes(x=homeCountyName,y=numberOfJobs, fill=homeCountyName)) +
   geom_bar(stat = "identity")+
   labs(x = "Home County", 
        y = "Number of Jobs", 
-       title = "Number of Jobs by County")) |> 
+       title = "Number of Jobs by County")+
+     scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )) |> 
   plotly::ggplotly()
 
 empDataHomeSubset |> 
@@ -757,11 +728,16 @@ empDataHomeSubset |>
   DT::formatCurrency('Number of Jobs', currency = "", digits=0)
 
 (empDataHomeSubset |> 
+    filter(year==currReportYear) |> 
   ggplot(aes(x=workCountyName,y=numberOfJobs, fill=workCountyName)) +
   geom_bar(stat = "identity")+
   labs(x = "Work County", 
        y = "Number of Jobs", 
-       title = "Number of Jobs by County")) |> 
+       title = "Number of Jobs by County")+
+     scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )) |> 
   plotly::ggplotly()
 ```
 
