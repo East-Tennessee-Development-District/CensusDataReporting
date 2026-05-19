@@ -16,6 +16,7 @@ execute:
   cache: true
 params:
   refreshdata: FALSE
+  county: "Anderson"
 ---
 
 ```{r initializing}
@@ -34,10 +35,10 @@ if (exists("fxsVars")) {
 }
 source(here::here("scripts","defineColors.R"))
 
-currentCounty <- "Anderson"
-currentMunicipalities <- municipalitiesInAnderson
+currentCounty <- params$county
+currentMunicipalities <- paste0("municipalitiesIn",currentCounty)
 
-}
+
 
 if (file.exists(here::here("data","clean","odsCombined.csv")) & !refreshData) {
  empData2010 <- read_csv(here::here("data","clean","odsCombined.csv")) |> 
