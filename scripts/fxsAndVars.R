@@ -216,6 +216,44 @@ if(FALSE){
     print(n=50)
 }
 
+getPlaceNamesInCounties <- function(placeFileName,countyFileName){
+  countiesShapeFile <- sf::read_sf(countyFileName)
+  
+  # Convert the area geometry to WKT
+  wkt <- countiesShapeFile |> 
+    filter(NAME %in% countiesInETDDNameOnly) |>
+    sf::st_combine() |> 
+    sf::st_geometry() |>
+    sf::st_as_text()
+  
+  # Read the filtered dataset using the bounding box
+  placeNames <- sf::read_sf(placeFileName, wkt_filter = wkt) |> 
+    as_tibble() |> 
+    select(NAME) |> 
+    arrange(NAME) |> 
+    pull()
+return(placeNames)
+}
+
+if(FALSE){
+  currETDDNames <- data.frame(NAME=municipalitiesInETDD)
+  
+  cityTownRegex <- "(CDP)?(city)?(town)?"
+  placeNames <- getPlaceNamesInCounties(here::here("data","clean","tigerFiles2020place.gpkg"),
+                 here::here("data","clean","tigerFiles2020county.gpkg"))
+  notInList <- 
+      currETDDNames |> 
+        mutate(NAME=str_remove(NAME,"\\s(city)?(town)?$")) |> 
+        anti_join(data.frame(NAME=placeNames))
+  
+  fuzzyMatchNames(acsNames,notInList,"NAME") |> 
+    mutate(ending=str_extract(NAME.y,"(city)|(town)|(CDP)")) |> 
+    arrange(desc(ending)) |> 
+    print(n=50)
+    
+    
+}
+
 # ||| Getting
 getCensusData <- function(censusYear, state, vars, fileName, surveyName, geographyLevel, getShapeFile = FALSE){
   varFromAPI <- load_variables(censusYear, dataset=surveyName, cache=TRUE)
