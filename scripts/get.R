@@ -19,6 +19,61 @@ if (file.exists(here::here("scripts","secrets.R")) &
 
 ## ||| For figuring
 if(TRUE){}else{
+  
+  #ipums
+  
+  
+#   1950_tPH_Major
+  tPH_Major <- ipumsr::get_metadata("nhgis", dataset = "1950_tPH_Major")
+  totalPop <- ipumsr::get_metadata("nhgis", time_series_table = "AV0")
+  
+  
+  dss <- ipumsr::get_metadata_catalog("nhgis", metadata_type = "datasets")
+  dsss <- ipumsr::get_metadata_catalog("nhgis", metadata_type = "data_tables")
+  ipumsr::catalog_types(collection = "nhgis")
+  ds <- ipumsr::get_metadata_catalog("nhgis", metadata_type = "time_series_tables")
+  dss |> filter(str_detect(group,"1950"))
+  # 4 1950_tPH_Major 1950 Census Population & Housing Data [Tracts: Major Cities & Surrounds]          3204
+  
+  acceptGeoLevels <- c(
+    # "division",           
+    "tract",            
+    # "cty_sub",            
+    "place",              
+    "blck_grp",           
+    # "cd111th",            
+    # "cbsa",               
+    # "urb_area",           
+    "zcta"
+  )
+  desired_years <- c(
+    "1950","1960","1970","1980","1990","2000"
+  )
+  
+  ds |> select(name,description,geog_levels,years) |> 
+    unnest(cols=c(geog_levels), names_sep = "_") |> 
+    unnest(years,names_sep = "_") |> 
+    select(name,description,geog_levels_name,years_description) |> 
+    filter(description == "Total Population") |> 
+    # filter(geog_levels_name %in% acceptGeoLevels) |> 
+    filter(years_description %in% desired_years) |> 
+    print(n=100)
+    
+  ds |> select(name,description,time_series) |> 
+    unnest(time_series,names_sep = "_")
+  
+  ds |> select(name,description,geog_levels) |> 
+    unnest(geog_levels, names_sep = "geo_") |> 
+    filter(geog_levelsgeo_name %in% acceptGeoLevels) |> 
+    # select(description) |> distinct() |> print(n=500)
+    #names()
+    select(name, description, geog_levelsgeo_name)
+  ds |> filter(name=="AV0") |> 
+    select(name,description,years) |> 
+    unnest(years,names_sep = "_") |> 
+    print(n=50)
+    
+
   varCheck <- load_variables(2020, dataset="pl", cache=TRUE)
   varCheck |> select(concept) |> distinct()
   
@@ -35,6 +90,28 @@ if(TRUE){}else{
         pull()
     )
 }
+
+# || Getting IPUMS data
+fileName <- here::here("data","raw","nhgis0001_csv.zip")
+if (file.exists(fileName)& !reset){
+  fortunes::fortune()
+} else {
+  totalPopExt <- ipumsr::define_extract_agg(
+    "nhgis",
+    description = "Time series total population table request",
+    time_series_tables = ipumsr::tst_spec(
+      "AV0",
+      geog_levels = c("county", "place"),
+      years = c("1970","1980","1990", "2000","2010","2020")
+    )
+  )
+  nhgis_ext_submitted <- ipumsr::submit_extract(totalPopExt)
+  nhgis_extract_complete <- ipumsr::wait_for_extract(nhgis_ext_submitted)
+  # ipumsr::is_extract_ready(nhgis_ext_submitted)
+  ipumsr::download_extract(nhgis_ext_submitted, download_dir = here::here("data","raw"))
+  
+}
+
 # || Getting ACS data
 for (geographyLevel in c("county", "place")){
   for (acsYear in acsYears){

@@ -140,6 +140,13 @@ if (file.exists(here::here("data","clean","acsDataCombined.csv"))) {
   source(here::here("scripts", "clean.R"))
   acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
 }
+if (file.exists(here::here("data","clean","ipumsPop.csv"))) {
+ pumsPopDf <- read_csv(here::here("data","clean","ipumsPop.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
+} else {
+  source(here::here("scripts", "clean.R"))
+  pumsPopDf <- read_csv(here::here("data","clean","ipumsPop.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
+}
+
 if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
  censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County"))
 } else {
@@ -210,18 +217,52 @@ and poverty status of families;
 
 ### Demographics {.tabset}
 
-#### Population and Growth {.columns}
-
+#### Population and Growth 
+::::{.columns}
 ```{r}
-#| title: Population and Growth
-#| label: pop
-
-censusDf |> filter(concept == "RACE", cleanedLabel=="Total") |> 
-  ggplot(aes(x=year, y=value, color=NAME))+
-  geom_line()
+#| label: popTable
+varsWithoutAComma <- pumsPopDf |> select(-NAME) |> names()
+pumsPopDf |> 
+  DT::datatable(
+    caption = "IPUMS NHGIS, University of Minnesota, www.nhgis.org ",
+  colnames = c('Place' = 'NAME')
+  ) |> 
+  # DT::formatPercentage('Percentage of People', 0) |>
+  DT::formatCurrency(varsWithoutAComma, currency = "", digits=1)
 
 ```
+```{r}
+#| label: popGraph
 
+plotly::ggplotly(
+  
+
+pumsPopDf |> 
+  pivot_longer(
+    cols = c(-NAME,-starts_with("Change")),
+    names_to = "year",
+    values_to = "population"
+  ) |> 
+  mutate(year=factor(year)) |> 
+  select(-starts_with("Change")) |> 
+  filter(!is.na(population)) |> 
+  ggplot( aes(x = year,
+                     y = population, 
+                     color = NAME,
+              group=NAME)) +
+  geom_line()+
+  labs(
+    caption = "IPUMS NHGIS, University of Minnesota, www.nhgis.org ",
+    color="Place",
+    y="Population"
+  ) +
+  scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+)
+```
+:::::
 #### Population Density 
 :::: {.columns}
 ```{r}

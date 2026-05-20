@@ -15,6 +15,96 @@ if (exists("fxsVars")) {
 
 # || Script
 
+# || IPUMS
+ipumsZipFileName <- here::here("data","raw","nhgis0001_csv.zip")
+fileName <- here::here("data","clean","ipumsPop.csv")
+if (file.exists(fileName)){
+  fortunes::fortune()
+} else {
+  
+  ipumsPlacePop <- loadIPUMSIfExists(ipumsZipFileName, "nhgis0001_csv/nhgis0001_ts_nominal_place.csv") |> 
+    filter(STATE=="Tennessee") |> 
+    filter(PLACE %in% (municipalitiesInETDD)) |> 
+  select(PLACE,starts_with("AV")) |> 
+    pivot_longer(cols=-PLACE,names_to = "year",values_to = "population") |> 
+    mutate(year=str_remove(year,"AV0AA")) |> 
+    rename("NAME"=PLACE)
+    
+  ipumsCountyPop <- loadIPUMSIfExists(ipumsZipFileName, "nhgis0001_csv/nhgis0001_ts_nominal_county.csv") |> 
+    filter(STATE=="Tennessee") |> 
+    filter(COUNTY %in% (countiesInETDD)) |>
+    select(COUNTY,starts_with("AV")) |> 
+    pivot_longer(cols=-COUNTY,names_to = "year",values_to = "population") |> 
+    mutate(year=str_remove(year,"AV0AA")) |> 
+    rename("NAME"=COUNTY)
+  
+  rbind(ipumsCountyPop,ipumsPlacePop) |>
+    pivot_wider(names_from = year,values_from = population) |> 
+    mutate(
+      `Change 1970-1980`=`1980`-`1970`,
+      `Change 1980-1990`=`1990`-`1980`,
+      `Change 1990-2000`=`2000`-`1990`,
+      `Change 2000-2010`=`2010`-`2000`,
+      `Change 2010-2020`=`2020`-`2010`
+           )|> 
+    write_csv(fileName)
+  # select(PLACE,starts_with("NAME")) |> 
+    # print(n=90)
+  
+}
+
+# Manually copied tables
+
+recentPopFileName <- here::here("data","raw","existingWordTables","popRecent.csv")
+oldPopFileName <- here::here("data","raw","existingWordTables","popOlder.csv")
+read_csv(recentPopFileName) |> 
+  pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population", values_transform = as.character) |> 
+  rbind(
+    read_csv(oldPopFileName) |> 
+      pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population") 
+  ) |> 
+  mutate(
+    year=as.numeric(year),
+    population=ifelse(str_detect(population,"--"),NA,population),
+    population=ifelse(str_detect(population,"-"),NA,population),
+    population=as.numeric(
+      str_remove(
+        str_remove(
+          str_remove(
+            str_remove(
+              str_remove(population,","),
+              "\\(\\w\\)"),
+            "[a-z]"),
+         "\""),
+        "\'")
+    )
+  ) |> 
+  filter(!is.na(year)) |> 
+  distinct() |> 
+  filter(Area=="Oak Ridge")
+  pivot_wider(names_from = "year", values_from = "population") 
+  |> 
+  
+
+fileName <- here::here("data","raw","existingWordTables","popOlder.csv")
+read_csv(fileName) |> 
+  pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population") |> 
+  mutate(
+    year=as.numeric(year),
+    population=ifelse(str_detect(population,"--"),NA,population),
+    asNumpop=as.numeric(
+      str_remove(
+        str_remove(
+          str_remove(
+            str_remove(population,","),
+                      "\\(\\w\\)"),
+                      "[a-z]"),
+                      "\"")
+      )
+  ) |> 
+  filter(!is.na(year))
+  
+
 # Place Files
 censusYear <- 2020
 for (geographyLevel in c("county","place")){
