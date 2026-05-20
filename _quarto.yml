@@ -1,0 +1,21 @@
+project:
+  output-dir: docs
+
+bibliography: resources/references.bib  
+csl: resources/chicago-notes-intext-bibliography-access-dates.csl
+title: | 
+  ![](/resources/ETDDLogo.svg){width=1in} ETDD Census Data
+logo:
+  small: /resources/ETDDLogo.svg
+  medium: /resources/ETDDLogo.svg
+format: 
+  dashboard:
+    css: resources/custom.css
+    embed-resources: true   
+    orientation: rows
+    theme: 
+        light: flatly
+        dark: darkly
+    scrolling: true
+execute: 
+  cache: true
