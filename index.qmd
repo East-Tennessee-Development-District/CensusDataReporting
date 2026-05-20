@@ -3,6 +3,7 @@ execute:
   cache: true
 params:
   refreshdata: FALSE
+type: "website"
 ---
 
 ```{r initializing}
