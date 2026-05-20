@@ -1,0 +1,37 @@
+---
+execute: 
+  cache: true
+params:
+  refreshdata: FALSE
+---
+
+```{r initializing}
+#| include: false
+#| cache: false
+
+refreshData <- params$refreshdata
+if (exists("startrun")) {
+  print(fortunes::fortune())
+} else {
+  source(here::here("Scripts","StartHere.r"))
+}
+if (exists("fxsVars")) {
+  print(fortunes::fortune())
+} else {
+  source(here::here("scripts","fxsAndVars.R"))
+}
+source(here::here("scripts","defineColors.R"))
+
+```
+
+# Overview
+
+## Column {.tabset}
+
+### Overview of this product
+
+This dashboard is currently under construction. Please check back soon!
+
+This dashboard shows data primarily from the 2020 Decennial Census and 2020 American Community Survey. For a description of the data and sources, please see the "Data" Tab.
+
+### Shiny App
