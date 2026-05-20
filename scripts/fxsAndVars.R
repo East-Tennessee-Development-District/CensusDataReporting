@@ -187,8 +187,8 @@ acsYears <- c(2010, 2020)
 
 # ||| Dev
 fuzzyMatchNames <- function(currNamesDf,canonDf,nameVar, numResponse=1){
-  currNamesMissing <- anti_join(currETDDNames,acsNames) 
-  canonNamesNotAssigned <- anti_join(acsNames,currETDDNames)
+  currNamesMissing <- anti_join(currNamesDf,canonDf) 
+  canonNamesNotAssigned <- anti_join(canonDf,currNamesDf)
   nameMatches <-  fuzzyjoin::stringdist_join(currNamesMissing, canonNamesNotAssigned, 
                                   by = nameVar,
                                   mode = "left",
