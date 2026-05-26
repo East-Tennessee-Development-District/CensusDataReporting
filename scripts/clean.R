@@ -334,6 +334,19 @@ if(file.exists(fileName) & !reset){print(fortunes::fortune())} else {
       }
       
     }}
+  readingFileName <- here::here("data","raw","existingWordTables","industry.csv")
+  if(file.exists(readingFileName)){
+    historicalIndustryData <- read_csv(readingFileName) |> 
+    # historicalIndustryData |> 
+      filter(!is.na(Industry)) |> 
+      pivot_longer(cols=c(-County,-Industry),names_to = "year",values_to = "estimate") |> 
+      filter(year<2009) |> 
+      mutate(concept="INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER") |> 
+      rename("NAME"="County","cleanedLabel"="Industry")
+    combinedAcsDf <- combinedAcsDf |> 
+      rbind(historicalIndustryData)
+  }
+    
   combinedAcsDf |> 
     write_csv(fileName)
 }
