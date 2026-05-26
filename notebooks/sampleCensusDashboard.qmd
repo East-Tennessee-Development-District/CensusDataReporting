@@ -40,9 +40,7 @@ if (exists("fxsVars")) {
 source(here::here("scripts","defineColors.R"))
 
 currentCounty <- params$county
-currentMunicipalities <- paste0("municipalitiesIn",currentCounty)
-
-
+currentMunicipalities <- paste0("municipalitiesIn",currentCounty,"NameOnly")
 
 if (file.exists(here::here("data","clean","odsCombined.csv")) & !refreshData) {
  empData2010 <- read_csv(here::here("data","clean","odsCombined.csv")) |> 

@@ -304,6 +304,7 @@ if(FALSE){
       .default=cleanedLabel)
     ) |>
     filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDD) |> 
+    mutate(NAME = str_remove(NAME,str_c("\\s?",cityTownRegex,"$"))) |> 
     group_by(NAME,concept,cleanedLabel,year)|>
     summarize(estimate=sum(estimate))|> 
 
@@ -352,7 +353,7 @@ for (geographyLevel in c("county", "place")){
     censusDF <- censusDF |> 
       mutate(
         year = censusYear,
-        NAME = str_remove(NAME, ", Tennessee"),
+        NAME = str_remove(NAME, str_c("\\s?",cityTownRegex,", Tennessee$")),
         cleanedLabel = case_when(
           concept == "RACE" & str_detect(label, "White alone") ~ "White",
           concept == "RACE" & str_detect(label,"Black or African American alone") ~ "Black",
@@ -367,7 +368,7 @@ for (geographyLevel in c("county", "place")){
              )
               
       ) |> 
-      filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDD) |>
+      filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDDNameOnly) |>
       group_by(GEOID,NAME,concept,cleanedLabel,year) |> 
       summarize(value=sum(value)) |> 
       ungroup()

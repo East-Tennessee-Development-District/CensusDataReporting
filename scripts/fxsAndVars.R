@@ -158,6 +158,22 @@ municipalitiesInUnion <- c(
   "Plainview city"
 )
 
+municipalitiesInAndersonNameOnly <- municipalitiesInAnderson |> str_remove(str_c("\\s?",cityTownRegex,"$"))
+municipalitiesInBlountNameOnly <- municipalitiesInBlount |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInCampbellNameOnly <- municipalitiesInCampbell |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInClaiborneNameOnly <- municipalitiesInClaiborne |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInCockeNameOnly <- municipalitiesInCocke |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInGraingerNameOnly <- municipalitiesInGrainger |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInHamblenNameOnly <- municipalitiesInHamblen |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInJeffersonNameOnly <- municipalitiesInJefferson |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInKnoxNameOnly <- municipalitiesInKnox |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInLoudonNameOnly <- municipalitiesInLoudon |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInMonroeNameOnly <- municipalitiesInMonroe |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInMorganNameOnly <- municipalitiesInMorgan |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInRoaneNameOnly <- municipalitiesInRoane |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInScottNameOnly <- municipalitiesInScott |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInSevierNameOnly <- municipalitiesInSevier |> str_remove(str_c("\\s?", cityTownRegex,"$"))
+municipalitiesInUnionNameOnly <- municipalitiesInUnion |> str_remove(str_c("\\s?", cityTownRegex,"$"))
 
 
 municipalitiesInETDD <- c(
@@ -179,6 +195,24 @@ municipalitiesInETDD <- c(
   municipalitiesInUnion
 )
 
+municipalitiesInETDDNameOnly <- c(
+  municipalitiesInAndersonNameOnly,
+  municipalitiesInBlountNameOnly,
+  municipalitiesInCampbellNameOnly,
+  municipalitiesInClaiborneNameOnly,
+  municipalitiesInCockeNameOnly,
+  municipalitiesInGraingerNameOnly,
+  municipalitiesInHamblenNameOnly,
+  municipalitiesInJeffersonNameOnly,
+  municipalitiesInKnoxNameOnly,
+  municipalitiesInLoudonNameOnly,
+  municipalitiesInMonroeNameOnly,
+  municipalitiesInMorganNameOnly,
+  municipalitiesInRoaneNameOnly,
+  municipalitiesInScottNameOnly,
+  municipalitiesInSevierNameOnly,
+  municipalitiesInUnionNameOnly
+)
 
 censusYears <- c(2010, 2020)
 acsYears <- c(2010, 2020)
