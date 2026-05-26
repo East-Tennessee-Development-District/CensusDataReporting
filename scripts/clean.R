@@ -56,57 +56,6 @@ if (file.exists(fileName)){
   
 }
 
-# Manually copied tables
-
-recentPopFileName <- here::here("data","raw","existingWordTables","popRecent.csv")
-oldPopFileName <- here::here("data","raw","existingWordTables","popOlder.csv")
-read_csv(recentPopFileName) |> 
-  pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population", values_transform = as.character) |> 
-  rbind(
-    read_csv(oldPopFileName) |> 
-      pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population") 
-  ) |> 
-  mutate(
-    year=as.numeric(year),
-    population=ifelse(str_detect(population,"--"),NA,population),
-    population=ifelse(str_detect(population,"-"),NA,population),
-    population=as.numeric(
-      str_remove(
-        str_remove(
-          str_remove(
-            str_remove(
-              str_remove(population,","),
-              "\\(\\w\\)"),
-            "[a-z]"),
-         "\""),
-        "\'")
-    )
-  ) |> 
-  filter(!is.na(year)) |> 
-  distinct() |> 
-  filter(Area=="Oak Ridge")
-  pivot_wider(names_from = "year", values_from = "population") 
-  |> 
-  
-
-fileName <- here::here("data","raw","existingWordTables","popOlder.csv")
-read_csv(fileName) |> 
-  pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population") |> 
-  mutate(
-    year=as.numeric(year),
-    population=ifelse(str_detect(population,"--"),NA,population),
-    asNumpop=as.numeric(
-      str_remove(
-        str_remove(
-          str_remove(
-            str_remove(population,","),
-                      "\\(\\w\\)"),
-                      "[a-z]"),
-                      "\"")
-      )
-  ) |> 
-  filter(!is.na(year))
-  
 
 # Place Files
 censusYear <- 2020
