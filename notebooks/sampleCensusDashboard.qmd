@@ -253,6 +253,7 @@ pumsPopDf |>
                      color = NAME,
               group=NAME)) +
   geom_line()+
+  geom_point()+
   labs(
     caption = "IPUMS NHGIS, University of Minnesota, www.nhgis.org ",
     color="Place",
