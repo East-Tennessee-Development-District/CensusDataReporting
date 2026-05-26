@@ -18,6 +18,7 @@ execute:
 params:
   refreshdata: FALSE
   county: "Anderson"
+  tableIdStart: 1
 ---
 
 ```{r initializing}
@@ -25,6 +26,7 @@ params:
 #| cache: false
 
 refreshData <- params$refreshdata
+tableId <- params$tableIdStart
 if (exists("startrun")) {
   print(fortunes::fortune())
 } else {
@@ -226,11 +228,12 @@ varsWithoutAComma <- pumsPopDf |> select(-NAME) |> names()
 pumsPopDf |> 
   DT::datatable(
     caption = "IPUMS NHGIS, University of Minnesota, www.nhgis.org ",
-  colnames = c('Place' = 'NAME')
+  colnames = c('Place' = 'NAME'),
+  elementId = paste0("DataTables_",tableId)
   ) |> 
   # DT::formatPercentage('Percentage of People', 0) |>
   DT::formatCurrency(varsWithoutAComma, currency = "", digits=1)
-
+tableId <- tableId+1
 ```
 ```{r}
 #| label: popGraph
@@ -264,8 +267,29 @@ pumsPopDf |>
 )
 ```
 :::::
+
 #### Population Density 
+
 :::: {.columns}
+
+
+```{r}
+#| label: popDensityTable
+censusDf |> filter(cleanedLabel=="area" | cleanedLabel == "populationDensity") |> 
+  pivot_wider(values_from = value, names_from = cleanedLabel) |> 
+  mutate(NAME=ifelse(NAME=="Rocky Top","Rocky Top(a)",NAME)) |> 
+  select(-GEOID,-concept, -year) |> 
+  DT::datatable(
+    caption = "Density is population / area (in square miles) \\n (a) Formerly Lake City",
+  colnames = c('Place' = 'NAME', 'Population Density' = 'populationDensity','Area'='area'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  # DT::formatPercentage('Percentage of People', 0) |>
+  DT::formatCurrency('Area', currency = "", digits=1) |> 
+  DT::formatCurrency('Population Density', currency = "", digits=1)
+tableId <- tableId+1
+```
 ```{r}
 #| label: popDensityFig
 
@@ -292,21 +316,6 @@ censusDf |> filter(cleanedLabel == "populationDensity") |>
   
 
 ```
-
-```{r}
-#| label: popDensityTable
-censusDf |> filter(cleanedLabel=="area" | cleanedLabel == "populationDensity") |> 
-  pivot_wider(values_from = value, names_from = cleanedLabel) |> 
-  select(-GEOID,-concept, -year) |> 
-  DT::datatable(
-    caption = "Density is population / area (in square miles)",
-  colnames = c('Place' = 'NAME', 'Population Density' = 'populationDensity','Area'='area')
-  ) |> 
-  # DT::formatPercentage('Percentage of People', 0) |>
-  DT::formatCurrency('Area', currency = "", digits=1) |> 
-  DT::formatCurrency('Population Density', currency = "", digits=1)
-
-```
 ::::
 
 
@@ -315,7 +324,7 @@ censusDf |> filter(cleanedLabel=="area" | cleanedLabel == "populationDensity") |
 :::{.row}
 ```{r}
 #| label: popDescRaceTable
-
+pctVarName <- "Percentage of People"
 max_num <- acsDf |> 
   filter(concept=="AGE AND SEX") |> 
   filter(str_detect(cleanedLabel,"Total population"), !str_detect(cleanedLabel,"TotalTotal")) |> 
@@ -362,9 +371,11 @@ censusDf |>
   select(NAME, cleanedLabel, value) |> 
 DT::datatable(
   colnames = c('Place' = 'NAME','Number of People' = 'value',
-               'Race Category' = 'cleanedLabel')
+               'Race Category' = 'cleanedLabel'),
+    elementId = paste0("DataTables_",tableId)
   ) |> 
   DT::formatCurrency('Number of People', currency = "", digits=0)
+tableId <- tableId+1
 ```
 ```{r}
 #| label: popRaceGraph
@@ -508,11 +519,12 @@ acsDf |>
   mutate(pctOfEstimate = estimate/totalOfEducation) |> 
   select(-concept) |> 
   DT::datatable(
-  colnames = c('Place' = 'NAME', 'Level of Education' = 'cleanedLabel', 'Number of People' = 'estimate',
-               'Percentage of People' = 'pctOfEstimate')
+  colnames = c('Place' = 'NAME', 'Level of Education' = 'cleanedLabel', 'Number of People' = 'estimate', 'Year'='year'),
+    elementId = paste0("DataTables_",tableId)
   ) |> 
   DT::formatPercentage('Percentage of People', 0) |>
   DT::formatCurrency('Number of People', currency = "", digits=0)
+tableId <- tableId+1
 ```
 
 ```{r}
@@ -552,9 +564,12 @@ tmpDf <- acsDf |> filter(concept == "YEAR STRUCTURE BUILT") |>
 tmpDf |> 
   DT::datatable(
     caption = "Housing Units by Year of Construction",
-  colnames = c('Place' = 'NAME')
+  colnames = c('Place' = 'NAME'),
+    elementId = paste0("DataTables_",tableId)
+
   ) |> 
   DT::formatCurrency(which(sapply(tmpDf,is.numeric)), currency = "", digits=0)
+tableId <- tableId+1
 ```
 
 ```{r}
@@ -593,10 +608,12 @@ tmpDf |>
   DT::datatable(
     
   caption = "Housing Units by Tenure Status",
-  colnames = c('Place' = 'NAME')
+  colnames = c('Place' = 'NAME'),
+    elementId = paste0("DataTables_",tableId)
   ) |> 
   DT::formatCurrency(which(sapply(tmpDf,is.numeric)), currency = "", digits=0)
 
+tableId <- tableId+1
 ```
 
 ```{r}
@@ -626,12 +643,13 @@ acsDf |>
   select(NAME,estimate,year) |> 
   DT::datatable(
     
-  colnames = c('Place' = 'NAME', 'Year'='year', 
-               'Income' = 'estimate')
+  colnames = c('Place' = 'NAME', 'Year'='year'),
+    elementId = paste0("DataTables_",tableId)
   ) |> 
   # DT::formatPercentage('Percentage of People', 0) |>
   DT::formatCurrency('Income', currency = "", digits=0)
 
+tableId <- tableId+1
 ```
 
 ``` {r}
@@ -667,11 +685,14 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
   select(NAME,cleanedLabel,year,estimate) |> 
   pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
 DT::datatable(
-    colnames = c('Place' = 'NAME', 'Year'='year')
+    colnames = c('Place' = 'NAME', 'Year'='year'),
+      elementId = paste0("DataTables_",tableId)
+
   ) |> 
   # DT::formatPercentage('Percentage of People', 0) |>
   DT::formatCurrency('Above Poverty', currency = "", digits=0) |> 
   DT::formatCurrency('Below Poverty', currency = "", digits=0)
+tableId <- tableId+1
 ```
 
 ```{r}
@@ -714,11 +735,14 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
   relocate(year, .after = last_col()) |> 
   # pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
 DT::datatable(
-  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Families'='estimate')
+  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Families'='estimate'),
+    elementId = paste0("DataTables_",tableId)
+
   ) |> 
   # DT::formatPercentage('Percentage of People', 0) |>
   # DT::formatCurrency('Above Poverty', currency = "", digits=0) |> 
   DT::formatCurrency('Number of Families', currency = "", digits=0)
+tableId <- tableId+1
 ```
 
 ```{r}
@@ -767,10 +791,10 @@ acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED PO
   group_by(NAME,cleanedLabel,year) |> 
   summarize(estimate=sum(estimate)) |> 
 DT::datatable(
-  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate', 'Industry'='cleanedLabel')
-  ) |> 
-  DT::formatCurrency('Number of Jobs', currency='', digits=0)
+  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate', 'Industry'='cleanedLabel'),
+    elementId = paste0("DataTables_",tableId)
 
+tableId <- tableId+1
 ```
 
 ```{r}
@@ -808,10 +832,12 @@ acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED PO
   group_by(NAME,year,cleanedLabel) |> 
   summarize(estimate=sum(estimate)) |> 
 DT::datatable(
-  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate')
-  ) |> 
   DT::formatCurrency('Number of Jobs', currency='', digits=0)
+  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate', 'Industry'='cleanedLabel'),
+    elementId = paste0("DataTables_",tableId)
 
+  ) |> 
+tableId <- tableId+1
 ```
 :::::
 #### Labor Force by Place of Work
@@ -825,11 +851,14 @@ acsDf |>
   pivot_wider(values_from = estimate,names_from = cleanedLabel) |> 
   
 DT::datatable(
-    colnames = c('Place' = 'NAME', 'Year'='year')
+    colnames = c('Place' = 'NAME', 'Year'='year'),
+      elementId = paste0("DataTables_",tableId)
+
   ) |> 
   DT::formatCurrency('Work Out Of State', currency='', digits=0) |> 
   DT::formatCurrency('Work Out of County of Residence', currency='', digits=0) |> 
   DT::formatCurrency('Work in County of Residence', currency='', digits=0) 
+tableId <- tableId+1
 ```
 
 ```{r}
@@ -862,7 +891,9 @@ empDataWorkSubset |>
   bind_rows(totalWork) |> 
  DT::datatable(
   caption = "Anderson County laborers by counties where laborers reside",
-  colnames = c('Home County' = 'homeCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs')
+  colnames = c('Home County' = 'homeCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs', 'Year'='year'),
+    elementId = paste0("DataTables_",tableId)
+
   ) |> 
   DT::formatPercentage('Percentage of Jobs', 0) |> 
   DT::formatCurrency('Number of Jobs', currency = "", digits=0)
@@ -870,15 +901,18 @@ empDataHomeSubset |>
   bind_rows(totalHome) |> 
  DT::datatable(
   caption = "Anderson County residents by counties where residents work",
-  colnames = c('Work County' = 'workCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs')
+  colnames = c('Work County' = 'workCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs','Year'='year'),
+    elementId = paste0("DataTables_",tableId)
+
   ) |> 
   DT::formatPercentage('Percentage of Jobs', 0) |> 
   DT::formatCurrency('Number of Jobs', currency = "", digits=0)
-
+tableId <- tableId+1
 ```
 
 ``` {r}
 #| label: commutingGraphs
+plotly::ggplotly(
 (empDataWorkSubset |> 
     filter(year==currReportYear) |> 
   ggplot(aes(x=homeCountyName,y=numberOfJobs)) +
@@ -889,10 +923,10 @@ empDataHomeSubset |>
      scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
-   )) |> 
-  plotly::ggplotly()
+   )) 
+  )
 
-
+plotly::ggplotly(
 (empDataHomeSubset |> 
     filter(year==currReportYear) |> 
   ggplot(aes(x=workCountyName,y=numberOfJobs)) +
@@ -903,14 +937,17 @@ empDataHomeSubset |>
      scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
-   )) |> 
-  plotly::ggplotly()
+   )) 
+  )
 ```
+:::::
+
 
 
 
 # Blount
 ```{r}
+#| label: end
 
 ```
 
