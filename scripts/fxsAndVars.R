@@ -347,6 +347,60 @@ loadIPUMSIfExists <- function(zipFileName, selectedFileName){
   return( ipumsr::read_ipums_agg(filepath,file_select = selectedFileName))
 }
 
+# ||| Formatting / Display
+
+addPercentVar <- function(df, percentVarName, valueVarName = "estimate", totalVarName="cleanedLabel", totalVarValue="Total", 
+                          year=NA, yearVar="year"){
+  if(!is.na(year)){
+    yr_value <- year
+    totalOfVar <- df |> 
+      # Note- you pass the var name in as a string, sym() converts it to a symbol,
+      # and !! unquotes it.
+      ## See Advanced R or the rlang documentation for more details
+      filter(
+        !!sym(totalVarName) == totalVarValue,
+             .data[[yearVar]] == yr_value
+             ) |> 
+      select(!!sym(valueVarName)) |>
+      summarize(sum=sum(!!sym(valueVarName))) |> 
+      pull()
+  }else{
+    totalOfVar <- df |> 
+      filter(!!sym(totalVarName) == totalVarValue) |> 
+      select(!!sym(valueVarName)) |>  
+      pull()
+  }
+  # safeVarName <- paste0('`',percentVarName,'`')
+  if(!is.na(year)){
+    yr_value <- year
+    df <- df |>
+      mutate(!!sym(percentVarName) := 
+               if( percentVarName %in% names(cur_data())){
+                 ifelse(.data[[yearVar]]==yr_value,
+                        .data[[valueVarName]]/totalOfVar,
+                        !!sym(percentVarName))
+               } else {
+                 ifelse(.data[[yearVar]]==yr_value,
+                        .data[[valueVarName]]/totalOfVar,
+                        NA)
+               } 
+               
+               # ifelse(.data[[yearVar]]==yr_value,
+               #                               .data[[valueVarName]]/totalOfVar, 
+               #                              (ifelse((  !is.na(.data[[percentVarName]])),
+               #                                       !!sym(percentVarName),
+               #                                       NA))
+               #                              )
+             )
+      # mutate({{ percentVarName }} := ifelse(.data[[yearVar]]==yr_value, .data[[valueVarName]]/totalOfVar, NA))
+  }else{
+    df <- df |>
+      mutate({{ percentVarName }} := .data[[valueVarName]]/totalOfVar)
+  }
+  return(
+    df
+    )
+}
 
 # || Final
 fxsVarsrun <- TRUE
