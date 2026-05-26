@@ -432,7 +432,7 @@ censusDf |> filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel
 ``` {r}
 #| label: popPyramid
 population_pyramid_men <- popPyramidData |>
-  filter(Sex == "Male", NAME==currentCounty) |>
+  filter(Sex == "Male", NAME==str_c(currentCounty, " County")) |>
   ggplot(aes(
     x = estimate,
     y = AgeRange
@@ -464,7 +464,7 @@ population_pyramid_men <- popPyramidData |>
   )
 population_pyramid_women <-
   popPyramidData |>
-  filter(Sex == "Female",NAME==currentCounty) |>
+  filter(Sex == "Female", NAME==str_c(currentCounty, " County")) |>
   ggplot(aes(
     x = estimate,
     y = AgeRange
