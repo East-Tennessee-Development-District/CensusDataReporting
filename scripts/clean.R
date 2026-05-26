@@ -123,9 +123,9 @@ for (geographyLevel in c("county","place")){
 }
 
 # ACS
-for (geoLevel in c("county", "place")){
+for (geographyLevel in c("county", "place","state","us")){
   for (acsYear in acsYears){
-  geographyLevel <- geoLevel
+
   # acsYear <- 2020
   
 fileName <- here::here("data","clean",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
