@@ -579,9 +579,10 @@ tmpDf <- acsDf |> filter(concept == "YEAR STRUCTURE BUILT") |>
 varsWithAComma <- tmpDf |>  select(-NAME,-year) |> names()
 
 tmpDf |> 
+    relocate(Total, .after = last_col()) |> 
   DT::datatable(
     caption = "Housing Units by Year of Construction",
-  colnames = c('Place' = 'NAME'),
+  colnames = c('Place' = 'NAME', 'Year'='year'),
     elementId = paste0("DataTables_",tableId)
 
   ) |> 
