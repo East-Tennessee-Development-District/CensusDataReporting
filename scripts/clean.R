@@ -181,40 +181,52 @@ if(FALSE){
         str_detect(concept,"PER CAPITA INCOME IN THE PAST 12 MONTHS") &
           ! str_detect(concept, "ALONE") & !str_detect(concept,"HISPANIC") & 
           !str_detect(concept,"TWO")
-          ~ "per capita income",
+          ~ "Per Capita Income",
         concept == "TENURE" &
-          label == "EstimateTotal:"
+          str_detect(label,"^(EstimateTotal):?$")
         ~ "Total",
         concept == "TENURE" &
-          label == "EstimateTotal:Owner occupied"
+        str_detect(label,"^(EstimateTotal):?(Owner occupied)?$")
         ~ "Own",
         concept == "TENURE" &
-          label == "EstimateTotal:Renter occupied"
+    str_detect(label,"^(EstimateTotal):?(Renter occupied)?$")
         ~"Rent",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:"
+          label == "EstimateTotal:" |
+          label == "EstimateTotal"
         ~ "Total",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 1940 to 1949"
+          label == "EstimateTotal:Built 1940 to 1949" |
+          label == "EstimateTotalBuilt 1940 to 1949"
         ~ "1940-1959",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 1950 to 1959"
+          label == "EstimateTotal:Built 1950 to 1959" |
+          label == "EstimateTotalBuilt 1950 to 1959"
         ~ "1940-1959",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 1960 to 1969"
+          label == "EstimateTotal:Built 1960 to 1969" |
+          label == "EstimateTotalBuilt 1960 to 1969"
         ~ "1960-1979",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 1970 to 1979"
+          label == "EstimateTotal:Built 1970 to 1979" |
+          label == "EstimateTotalBuilt 1970 to 1979"
         ~ "1960-1979",
+    concept == "YEAR STRUCTURE BUILT" &
+      label == "EstimateTotal:Built 2000 to 2009" |
+      label == "EstimateTotalBuilt 2000 to 2004"|
+      label == "EstimateTotalBuilt 2005 or later"|
+    ~ "2000-2010",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 2010 to 2013"
+          label == "EstimateTotal:Built 2010 to 2013" |
+          label == "EstimateTotalBuilt 2010 to 2013"
         ~ "2010 or later",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 2014 or later"
+          label == "EstimateTotal:Built 2014 or later" |
+          label == "EstimateTotalBuilt 2014 or later"
         ~ "2010 or later",
         
         concept == "YEAR STRUCTURE BUILT"
-        ~ str_remove(label, "EstimateTotal:Built "),
+        ~ str_remove(label, "EstimateTotal(:)?Built "),
         concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
           label == "EstimateTotal:" | label == "EstimateTotal"
         ~ "Total",
@@ -262,6 +274,12 @@ if(FALSE){
           # !str_detect(label, "Percent") & 
           # str_detect(label, "Total Population")
         ~ str_remove(str_remove(label,"Estimate"),"Total population AGE"),
+        concept == "INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)" &
+          label == "EstimateHouseholdsMedian income (dollars)"
+        ~ "Median Household Income",
+        concept == "INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)" &
+          (label == "EstimateFamiliesMedian income (dollars)")
+        ~ "Median Family Income",
           
         .default= "Other"
       )
