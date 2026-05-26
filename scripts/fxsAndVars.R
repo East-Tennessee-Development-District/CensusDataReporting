@@ -293,24 +293,41 @@ getACSData <- function(acsYear, state, vars, fileName, surveyName, geographyLeve
         select(name) %>% 
         pull()
     )
-  
-  get_acs(
-    geography=geographyLevel,
-    variables = APIVars,
-    year = acsYear,
-    output = "tidy",
-    state = state,
-    cache_table = TRUE,
-    # county = countyName,
-    # key = keyring::key_get("CensusApi"),
-    survey = surveyName,
-    show_call = TRUE
-  ) |> 
-    left_join(varFromAPI, by=c("variable"="name")) |> 
-    mutate(
-      label=str_remove_all(label, "!")
+  if(geographyLevel!="us"){
+    get_acs(
+      geography=geographyLevel,
+      variables = APIVars,
+      year = acsYear,
+      output = "tidy",
+      state = state,
+      cache_table = TRUE,
+      # county = countyName,
+      # key = keyring::key_get("CensusApi"),
+      survey = surveyName,
+      show_call = TRUE
     ) |> 
-    write_csv(file = fileName)
+      left_join(varFromAPI, by=c("variable"="name")) |> 
+      mutate(
+        label=str_remove_all(label, "!")
+      ) |> 
+      write_csv(file = fileName)
+  } else {
+    get_acs(
+      geography=geographyLevel,
+      variables = APIVars,
+      year = acsYear,
+      output = "tidy",
+      cache_table = TRUE,
+      survey = surveyName,
+      show_call = TRUE
+    ) |> 
+      left_join(varFromAPI, by=c("variable"="name")) |> 
+      mutate(
+        label=str_remove_all(label, "!")
+      ) |> 
+      write_csv(file = fileName)
+  }
+  
   
 }
 
