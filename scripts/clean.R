@@ -29,7 +29,8 @@ if (file.exists(fileName)){
   select(PLACE,starts_with("AV")) |> 
     pivot_longer(cols=-PLACE,names_to = "year",values_to = "population") |> 
     filter((PLACE=="Rocky Top city" & !is.na(population)) | PLACE != "Rocky Top city") |> 
-    mutate(year=str_remove(year,"AV0AA")) |> 
+    mutate(year=str_remove(year,"AV0AA"),
+           PLACE=str_remove(PLACE,str_c("\\s?",cityTownRegex,"$"))) |> 
     rename("NAME"=PLACE)
     
   ipumsCountyPop <- loadIPUMSIfExists(ipumsZipFileName, "nhgis0001_csv/nhgis0001_ts_nominal_county.csv") |> 
