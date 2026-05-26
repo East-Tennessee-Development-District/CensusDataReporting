@@ -433,13 +433,13 @@ censusDf |> filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel
 ``` {r}
 #| label: popPyramid
 population_pyramid_men <- popPyramidData |>
-  filter(Sex == "Male") |>
+  filter(Sex == "Male", NAME==currentCounty) |>
   ggplot(aes(
     x = estimate,
-    y = AgeRange,
-    fill=NAME
+    y = AgeRange
+    
   )) +
-  geom_col()+
+  geom_col(fill=etddBlueDark)+
   annotate(
     geom = "label",
     x = 2*(max_num/3),
@@ -454,7 +454,7 @@ population_pyramid_men <- popPyramidData |>
     breaks = breaks_pretty(),
     limits = c(0, max_num)
   ) +
-  labs(x="",y="")+
+  labs(x="",y="", caption=str_c("data for ", currentCounty))+
   theme(
     axis.title.y=element_blank(),
     axis.text.y=element_blank(),
@@ -465,13 +465,13 @@ population_pyramid_men <- popPyramidData |>
   )
 population_pyramid_women <-
   popPyramidData |>
-  filter(Sex == "Female") |>
+  filter(Sex == "Female",NAME==currentCounty) |>
   ggplot(aes(
     x = estimate,
-    y = AgeRange,
-    fill = NAME
+    y = AgeRange
+   
   )) +
-  geom_col() +
+  geom_col(fill = etddGreen) +
   annotate(
     geom = "label",
     x =  -(2*(max_num/3)),
@@ -557,10 +557,10 @@ acsDf |>
     "Bachelor's degree",
     "Graduate or Professional Degree"
   ))) |> 
-     ggplot(aes(y=cleanedLabel, x=estimate, fill=NAME)) +
+     ggplot(aes(x=cleanedLabel, y=estimate, fill=NAME)) +
      geom_bar(stat="identity", position="dodge")+
   labs(x="Estimated Population",y="Education Category", fill="Place")+
-  scale_x_continuous(
+  scale_y_continuous(
     labels = scales::comma,
     breaks = breaks_pretty()
   )
@@ -571,7 +571,6 @@ acsDf |>
 ::::{.columns}
 ```{r}
 #| label: constYearTable
-
 tmpDf <- acsDf |> filter(concept == "YEAR STRUCTURE BUILT") |> 
   pivot_wider(
     names_from = cleanedLabel,
