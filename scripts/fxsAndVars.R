@@ -344,7 +344,7 @@ loadIPUMSIfExists <- function(zipFileName, selectedFileName){
   if(!file.exists(zipFileName)){
     source(here::here("scripts","get.R"))
   }
-  return( ipumsr::read_ipums_agg(filepath,file_select = selectedFileName))
+  return( ipumsr::read_ipums_agg(zipFileName,file_select = selectedFileName))
 }
 
 # ||| Formatting / Display
