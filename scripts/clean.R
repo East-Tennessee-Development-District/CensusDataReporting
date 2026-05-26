@@ -24,9 +24,11 @@ if (file.exists(fileName)){
   
   ipumsPlacePop <- loadIPUMSIfExists(ipumsZipFileName, "nhgis0001_csv/nhgis0001_ts_nominal_place.csv") |> 
     filter(STATE=="Tennessee") |> 
-    filter(PLACE %in% (municipalitiesInETDD)) |> 
+    filter(PLACE %in% c(municipalitiesInETDD,"Lake City city")) |> 
+    mutate(PLACE=ifelse(PLACE=="Lake City city","Rocky Top city",PLACE)) |> 
   select(PLACE,starts_with("AV")) |> 
     pivot_longer(cols=-PLACE,names_to = "year",values_to = "population") |> 
+    filter((PLACE=="Rocky Top city" & !is.na(population)) | PLACE != "Rocky Top city") |> 
     mutate(year=str_remove(year,"AV0AA")) |> 
     rename("NAME"=PLACE)
     
