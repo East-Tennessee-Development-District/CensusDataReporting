@@ -1,6 +1,9 @@
 # census api file
 scripts/secrets.R
 
+reports/*_files
+reports/*.html
+
 # History files
 .Rhistory
 .Rapp.history
@@ -43,6 +46,8 @@ vignettes/*.pdf
 .Renviron
 
 # pkgdown site
+
+#docs/
 
 
 # translation temp files

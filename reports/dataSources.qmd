@@ -1,0 +1,44 @@
+---
+title: "Data Description"
+format: html
+---
+
+Please note: a full description of these data sources will be provided at a later date.
+
+# Sources Used
+
+
+U.S. Census Bureau, “American Community Survey 5-Year Estimates: Comparison Profiles 5-Year,” 2020, <http://api.census.gov/data/2020/acs/acs5>, accessed on July 2, 2026.
+
+U.S. Census Bureau, “American Community Survey 5-Year Estimates: Comparison Profiles 5-Year,” 2010, <http://api.census.gov/data/2010/acs/acs5>, accessed on July 2, 2026.
+
+
+U.S. Census Bureau, “Decennial Census: Redistricting Data (PL 94-171),” 2020, <http://api.census.gov/data/2020/dec/pl>, accessed on July 1, 2026.
+
+U.S. Census Bureau, "Decennial SF1," 2010, <http://api.census.gov/data/2010/dec/sf1>, accessed on July 1, 2026.
+
+IPUMS NHGIS, University of Minnesota, www.nhgis.org 
+
+United States Census Bureau, 2020. 2020 TIGER/Line Shapefiles (machine readable data files). U.S. Department of Commerce. https://www.census.gov/cgi-bin/geo/shapefiles/index.php (Accessed July 1, 2026)
+
+LEHD Origin-Destination Employment Statistics (LODES)
+https://lehd.ces.census.gov/data/lodes/
+
+## Packages used
+Please note: this list is currently incomplete and will be updated at a later date
+
+@tidyCensus
+
+@ipumsr
+
+## Data Management
+
+High level description:
+ACS and Census column labels were cleaned to standardize them and prepare them for analysis and place names were changed to a more readable form. The data was subset to only those counties in ETDD's counties.
+
+Tiger files were used to get the area of each municipality and county. The area was converted into square miles and combined with the census data population to get population density. The data was subset to only those counties in ETDD's counties.
+
+IPUMS data was subset, the column names were changed, and changes from year to year were calculated and added to the data.
+
+LODES data was combined at the county level and the crosswalk was used to add the correct label for each county.
+

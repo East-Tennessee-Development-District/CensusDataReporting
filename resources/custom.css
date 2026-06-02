@@ -13,7 +13,9 @@ table.dataTable thead th {
       color: white !important;
     }
 .quarto-title-block .quarto-title-banner {
-  background-image: url(etddLogo.png);
+
+  background-image: url(ETDDLogo.svg);
+
   background-size: 300px;
   background-position: left;
   background-repeat: no-repeat;

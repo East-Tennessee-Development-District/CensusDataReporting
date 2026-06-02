@@ -24,10 +24,13 @@ if (file.exists(fileName)){
   
   ipumsPlacePop <- loadIPUMSIfExists(ipumsZipFileName, "nhgis0001_csv/nhgis0001_ts_nominal_place.csv") |> 
     filter(STATE=="Tennessee") |> 
-    filter(PLACE %in% (municipalitiesInETDD)) |> 
+    filter(PLACE %in% c(municipalitiesInETDD,"Lake City city")) |> 
+    mutate(PLACE=ifelse(PLACE=="Lake City city","Rocky Top city",PLACE)) |> 
   select(PLACE,starts_with("AV")) |> 
     pivot_longer(cols=-PLACE,names_to = "year",values_to = "population") |> 
-    mutate(year=str_remove(year,"AV0AA")) |> 
+    filter((PLACE=="Rocky Top city" & !is.na(population)) | PLACE != "Rocky Top city") |> 
+    mutate(year=str_remove(year,"AV0AA"),
+           PLACE=str_remove(PLACE,str_c("\\s?",cityTownRegex,"$"))) |> 
     rename("NAME"=PLACE)
     
   ipumsCountyPop <- loadIPUMSIfExists(ipumsZipFileName, "nhgis0001_csv/nhgis0001_ts_nominal_county.csv") |> 
@@ -53,57 +56,6 @@ if (file.exists(fileName)){
   
 }
 
-# Manually copied tables
-
-recentPopFileName <- here::here("data","raw","existingWordTables","popRecent.csv")
-oldPopFileName <- here::here("data","raw","existingWordTables","popOlder.csv")
-read_csv(recentPopFileName) |> 
-  pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population", values_transform = as.character) |> 
-  rbind(
-    read_csv(oldPopFileName) |> 
-      pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population") 
-  ) |> 
-  mutate(
-    year=as.numeric(year),
-    population=ifelse(str_detect(population,"--"),NA,population),
-    population=ifelse(str_detect(population,"-"),NA,population),
-    population=as.numeric(
-      str_remove(
-        str_remove(
-          str_remove(
-            str_remove(
-              str_remove(population,","),
-              "\\(\\w\\)"),
-            "[a-z]"),
-         "\""),
-        "\'")
-    )
-  ) |> 
-  filter(!is.na(year)) |> 
-  distinct() |> 
-  filter(Area=="Oak Ridge")
-  pivot_wider(names_from = "year", values_from = "population") 
-  |> 
-  
-
-fileName <- here::here("data","raw","existingWordTables","popOlder.csv")
-read_csv(fileName) |> 
-  pivot_longer(cols = (-"Area"), names_to = "year", values_to = "population") |> 
-  mutate(
-    year=as.numeric(year),
-    population=ifelse(str_detect(population,"--"),NA,population),
-    asNumpop=as.numeric(
-      str_remove(
-        str_remove(
-          str_remove(
-            str_remove(population,","),
-                      "\\(\\w\\)"),
-                      "[a-z]"),
-                      "\"")
-      )
-  ) |> 
-  filter(!is.na(year))
-  
 
 # Place Files
 censusYear <- 2020
@@ -120,9 +72,9 @@ for (geographyLevel in c("county","place")){
 }
 
 # ACS
-for (geoLevel in c("county", "place")){
+for (geographyLevel in c("county", "place","state","us")){
   for (acsYear in acsYears){
-  geographyLevel <- geoLevel
+
   # acsYear <- 2020
   
 fileName <- here::here("data","clean",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
@@ -178,40 +130,52 @@ if(FALSE){
         str_detect(concept,"PER CAPITA INCOME IN THE PAST 12 MONTHS") &
           ! str_detect(concept, "ALONE") & !str_detect(concept,"HISPANIC") & 
           !str_detect(concept,"TWO")
-          ~ "per capita income",
+          ~ "Per Capita Income",
         concept == "TENURE" &
-          label == "EstimateTotal:"
+          str_detect(label,"^(EstimateTotal):?$")
         ~ "Total",
         concept == "TENURE" &
-          label == "EstimateTotal:Owner occupied"
+        str_detect(label,"^(EstimateTotal):?(Owner occupied)?$")
         ~ "Own",
         concept == "TENURE" &
-          label == "EstimateTotal:Renter occupied"
+    str_detect(label,"^(EstimateTotal):?(Renter occupied)?$")
         ~"Rent",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:"
+          label == "EstimateTotal:" |
+          label == "EstimateTotal"
         ~ "Total",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 1940 to 1949"
+          label == "EstimateTotal:Built 1940 to 1949" |
+          label == "EstimateTotalBuilt 1940 to 1949"
         ~ "1940-1959",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 1950 to 1959"
+          label == "EstimateTotal:Built 1950 to 1959" |
+          label == "EstimateTotalBuilt 1950 to 1959"
         ~ "1940-1959",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 1960 to 1969"
+          label == "EstimateTotal:Built 1960 to 1969" |
+          label == "EstimateTotalBuilt 1960 to 1969"
         ~ "1960-1979",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 1970 to 1979"
+          label == "EstimateTotal:Built 1970 to 1979" |
+          label == "EstimateTotalBuilt 1970 to 1979"
         ~ "1960-1979",
+    concept == "YEAR STRUCTURE BUILT" &
+      label == "EstimateTotal:Built 2000 to 2009" |
+      label == "EstimateTotalBuilt 2000 to 2004"|
+      label == "EstimateTotalBuilt 2005 or later"|
+    ~ "2000-2010",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 2010 to 2013"
+          label == "EstimateTotal:Built 2010 to 2013" |
+          label == "EstimateTotalBuilt 2010 to 2013"
         ~ "2010 or later",
         concept == "YEAR STRUCTURE BUILT" &
-          label == "EstimateTotal:Built 2014 or later"
+          label == "EstimateTotal:Built 2014 or later" |
+          label == "EstimateTotalBuilt 2014 or later"
         ~ "2010 or later",
         
         concept == "YEAR STRUCTURE BUILT"
-        ~ str_remove(label, "EstimateTotal:Built "),
+        ~ str_remove(label, "EstimateTotal(:)?Built "),
         concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" &
           label == "EstimateTotal:" | label == "EstimateTotal"
         ~ "Total",
@@ -259,6 +223,12 @@ if(FALSE){
           # !str_detect(label, "Percent") & 
           # str_detect(label, "Total Population")
         ~ str_remove(str_remove(label,"Estimate"),"Total population AGE"),
+        concept == "INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)" &
+          label == "EstimateHouseholdsMedian income (dollars)"
+        ~ "Median Household Income",
+        concept == "INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)" &
+          (label == "EstimateFamiliesMedian income (dollars)")
+        ~ "Median Family Income",
           
         .default= "Other"
       )
@@ -302,6 +272,7 @@ if(FALSE){
       .default=cleanedLabel)
     ) |>
     filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDD) |> 
+    mutate(NAME = str_remove(NAME,str_c("\\s?",cityTownRegex,"$"))) |> 
     group_by(NAME,concept,cleanedLabel,year)|>
     summarize(estimate=sum(estimate))|> 
 
@@ -330,6 +301,19 @@ if(file.exists(fileName) & !reset){print(fortunes::fortune())} else {
       }
       
     }}
+  readingFileName <- here::here("data","raw","existingWordTables","industry.csv")
+  if(file.exists(readingFileName)){
+    historicalIndustryData <- read_csv(readingFileName) |> 
+    # historicalIndustryData |> 
+      filter(!is.na(Industry)) |> 
+      pivot_longer(cols=c(-County,-Industry),names_to = "year",values_to = "estimate") |> 
+      filter(year<2009) |> 
+      mutate(concept="INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER") |> 
+      rename("NAME"="County","cleanedLabel"="Industry")
+    combinedAcsDf <- combinedAcsDf |> 
+      rbind(historicalIndustryData)
+  }
+    
   combinedAcsDf |> 
     write_csv(fileName)
 }
@@ -350,7 +334,7 @@ for (geographyLevel in c("county", "place")){
     censusDF <- censusDF |> 
       mutate(
         year = censusYear,
-        NAME = str_remove(NAME, ", Tennessee"),
+        NAME = str_remove(NAME, str_c("\\s?",cityTownRegex,", Tennessee$")),
         cleanedLabel = case_when(
           concept == "RACE" & str_detect(label, "White alone") ~ "White",
           concept == "RACE" & str_detect(label,"Black or African American alone") ~ "Black",
@@ -365,7 +349,7 @@ for (geographyLevel in c("county", "place")){
              )
               
       ) |> 
-      filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDD) |>
+      filter(NAME %in% countiesInETDD | NAME %in% municipalitiesInETDDNameOnly) |>
       group_by(GEOID,NAME,concept,cleanedLabel,year) |> 
       summarize(value=sum(value)) |> 
       ungroup()

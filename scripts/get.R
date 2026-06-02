@@ -113,7 +113,7 @@ if (file.exists(fileName)& !reset){
 }
 
 # || Getting ACS data
-for (geographyLevel in c("county", "place")){
+for (geographyLevel in c("county", "place","state","us")){
   for (acsYear in acsYears){
 fileName <- here::here("data","interim",str_c("acsData",as.character(acsYear),geographyLevel,".csv"))
 subFileName <- here::here("data","interim",str_c("acsDataSubject",as.character(acsYear),geographyLevel,".csv"))
