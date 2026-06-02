@@ -1,0 +1,958 @@
+---
+title: "Anderson"
+format: dashboard
+params:
+  refreshdata: FALSE
+  county: "Anderson"
+  tableIdStart: 1
+---
+
+```{r initializing}
+#| include: false
+#| cache: true
+
+refreshData <- params$refreshdata
+tableId <- params$tableIdStart
+if (exists("startrun")) {
+  print(fortunes::fortune())
+} else {
+  source(here::here("Scripts","StartHere.r"))
+}
+if (exists("fxsVars")) {
+  print(fortunes::fortune())
+} else {
+  source(here::here("scripts","fxsAndVars.R"))
+}
+source(here::here("scripts","defineColors.R"))
+
+currentCounty <- params$county
+currentMunicipalities <- paste0("municipalitiesIn",currentCounty,"NameOnly")
+
+if (file.exists(here::here("data","clean","odsCombined.csv")) & !refreshData) {
+ empData2010 <- read_csv(here::here("data","clean","odsCombined.csv")) |> 
+   filter(workCountyName == currentCounty | homeCountyName == currentCounty) |>
+   select(-workPlaceName,-homePlaceName) |> 
+   filter(!is.na(numberOfJobs))
+
+ } else {
+   
+   source(here::here("scripts", "clean.R"))
+   empData2010 <- read_csv(here::here("data","clean","odsCombined.csv"))  |>
+    filter(workCountyName == currentCounty  | homeCountyName == currentCounty) |>
+    filter(!is.na(numberOfJobs))
+
+ }
+totalWorkJobs <- empData2010 |> 
+  filter(workCountyName == currentCounty) |> 
+  select(numberOfJobs) |> 
+  summarize(sum(numberOfJobs)) |> 
+  pull()
+totalHomeJobs <- empData2010 |> 
+  filter(workCountyName == currentCounty) |> 
+  select(numberOfJobs) |> 
+  summarize(sum(numberOfJobs)) |> 
+  pull()
+
+topWorkCounties <- empData2010 |> 
+  filter(workCountyName == currentCounty, year == currReportYear) |> 
+  group_by(homeCountyName) |>
+  summarize(numberOfJobs=sum(numberOfJobs)) |> 
+  arrange(desc(numberOfJobs)) |> 
+  top_n(numberOfTopCounties) |> 
+  select(homeCountyName) |> 
+  pull()
+
+topHomeCounties <- empData2010 |> 
+  filter(homeCountyName == currentCounty, year == currReportYear) |> 
+  group_by(workCountyName) |>
+  summarize(numberOfJobs=sum(numberOfJobs)) |> 
+  arrange(desc(numberOfJobs)) |> 
+  top_n(numberOfTopCounties) |> 
+  select(workCountyName) |> 
+  pull()
+
+topOverallCounties <- empData2010 |> 
+  pivot_longer(cols=c(-numberOfJobs,-year),values_to = "county") |> 
+  group_by(county) |> 
+  summarize(numberOfJobs=sum(numberOfJobs)) |> 
+  arrange(desc(numberOfJobs)) |> 
+  top_n(numberOfTopCounties) |> 
+  select(county) |> 
+  pull()
+
+topCounties <- unique(c(topWorkCounties,topHomeCounties))
+
+empDataWorkSubset <- empData2010 |> 
+  filter(workCountyName == currentCounty) |> 
+  mutate(
+    homeCountyName=ifelse(homeCountyName %in% topHomeCounties, homeCountyName, "All Other Locations"),
+    ) |> 
+  group_by(homeCountyName,year) |> 
+  summarize(
+    numberOfJobs=sum(numberOfJobs),
+    percentageOfJobs=numberOfJobs/totalWorkJobs
+    ) |> 
+  ungroup() |> 
+  mutate(isNotOther = ifelse(homeCountyName == "All Other Locations",0,1)) |> 
+  arrange(desc(isNotOther),desc(numberOfJobs) ) |> 
+    select(-isNotOther)
+  
+empDataHomeSubset <- empData2010 |> 
+  filter(homeCountyName == currentCounty) |> 
+  mutate(
+    workCountyName=ifelse(workCountyName %in% topWorkCounties, workCountyName, "All Other Locations"),
+    ) |> 
+  group_by(workCountyName,year) |> 
+  summarize(
+    numberOfJobs=sum(numberOfJobs),
+    percentageOfJobs=numberOfJobs/totalHomeJobs
+    ) |> 
+  ungroup() |> 
+  mutate(isNotOther = ifelse(workCountyName == "All Other Locations",0,1)) |> 
+  arrange(desc(isNotOther),desc(numberOfJobs) ) |> 
+    select(-isNotOther)
+
+totalWork <- empDataWorkSubset %>% 
+      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE))) %>% 
+      mutate(homeCountyName = "Total",year=NA)
+  
+totalHome <- empDataHomeSubset %>% 
+      summarise(across(where(is.numeric), \(x) sum(x, na.rm = TRUE))) %>% 
+      mutate(workCountyName = "Total",year=NA)
+ 
+
+if (file.exists(here::here("data","clean","acsDataCombined.csv"))) {
+ acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
+} else {
+  source(here::here("scripts", "clean.R"))
+  acsDf <- read_csv(here::here("data","clean","acsDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
+}
+if (file.exists(here::here("data","clean","ipumsPop.csv"))) {
+ pumsPopDf <- read_csv(here::here("data","clean","ipumsPop.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
+} else {
+  source(here::here("scripts", "clean.R"))
+  pumsPopDf <- read_csv(here::here("data","clean","ipumsPop.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County")) 
+}
+
+if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
+ censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County"))
+} else {
+  source(here::here("scripts", "clean.R"))
+  censusDf <- read_csv(here::here("data","clean","censusDataCombined.csv")) |> filter(NAME %in% get(currentMunicipalities) | NAME == str_c(currentCounty," County"))
+}
+
+theme_set(theme_classic())
+scale_colour_discrete <- scale_colour_viridis_d
+options(ggplot2.continuous.colour="mako")
+options(ggplot2.continuous.fill = "mako")
+options(ggplot2.discrete.colour = "mako_d")
+options(ggplot2.discrete.fill = "mako_d")
+options(ggplot2.ordinal.colour = "mako")
+options(ggplot2.ordinal.fill = "mako")
+scale_fill_discrete <- function(...) {
+   #scale_fill_manual(..., values = viridis_qualitative_pal7)
+  viridis::scale_fill_viridis(discrete = TRUE, option="G")
+} 
+options(DT.options = list(filter="top",
+    extensions = c('Buttons', 
+     'FixedHeader'),
+    options = list(
+    dom = 'Bfrtip',
+    buttons = c('copy', 'csv', 'excel', 'print'),
+    scrollX = TRUE,
+   fixedHeader=TRUE,
+  initComplete = DT::JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
+    "}")
+    )))
+```
+
+## Column {.tabset}
+### Description
+
+PUT MAP HERE
+
+INTRODUCTION
+This report is part of a series, which examines statistical data from U.S. Census materials regarding
+economic and demographic characteristics in the sixteen counties that make up the East
+Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with
+American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.
+
+Topics that will be discussed in this summary report for `r currentCounty` County are
+• population growth from 1950 to 2020;
+• population density;
+• demographic characteristics in terms of sex, race, and age;
+• economic characteristics in terms of family income, household income, per capita income,
+and poverty status of families;
+• employment classification according to industry;
+• labor force characteristics in terms of place of work and commuting patterns;
+• educational level of the adult population;
+• and housing characteristics in terms of age of the housing stock and type of tenure.
+
+### Demographics {.tabset}
+
+#### Population and Growth 
+::::{.columns}
+```{r}
+#| label: popTable
+varsWithoutAComma <- pumsPopDf |> select(-NAME) |> names()
+pumsPopDf |> 
+  DT::datatable(
+    caption = "IPUMS NHGIS, University of Minnesota, www.nhgis.org ",
+  colnames = c('Place' = 'NAME'),
+  elementId = paste0("DataTables_",tableId)
+  ) |> 
+  # DT::formatPercentage('Percentage of People', 0) |>
+  DT::formatCurrency(varsWithoutAComma, currency = "", digits=1)
+tableId <- tableId+1
+```
+```{r}
+#| label: popGraph
+
+plotly::ggplotly(
+  
+
+pumsPopDf |> 
+  pivot_longer(
+    cols = c(-NAME,-starts_with("Change")),
+    names_to = "year",
+    values_to = "population"
+  ) |> 
+  mutate(year=factor(year)) |> 
+  select(-starts_with("Change")) |> 
+  filter(!is.na(population)) |> 
+  ggplot( aes(x = year,
+                     y = population, 
+                     color = NAME,
+              group=NAME)) +
+  geom_line()+
+  geom_point()+
+  labs(
+    caption = "IPUMS NHGIS, University of Minnesota, www.nhgis.org ",
+    color="Place",
+    y="Population"
+  ) +
+  scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+)
+```
+:::::
+
+#### Population Density 
+
+:::: {.columns}
+
+
+```{r}
+#| label: popDensityTable
+censusDf |> filter(cleanedLabel=="area" | cleanedLabel == "populationDensity") |> 
+  pivot_wider(values_from = value, names_from = cleanedLabel) |> 
+  mutate(NAME=ifelse(NAME=="Rocky Top","Rocky Top(a)",NAME)) |> 
+  select(-GEOID,-concept, -year) |> 
+  DT::datatable(
+    caption = "Density is population / area (in square miles) \\n (a) Formerly Lake City",
+  colnames = c('Place' = 'NAME', 'Population Density' = 'populationDensity','Area'='area'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  # DT::formatPercentage('Percentage of People', 0) |>
+  DT::formatCurrency('Area', currency = "", digits=1) |> 
+  DT::formatCurrency('Population Density', currency = "", digits=1)
+tableId <- tableId+1
+```
+```{r}
+#| label: popDensityFig
+
+placesShapeFile <- sf::read_sf(here::here("data","clean","tigerFiles2020place.gpkg"))
+countiesShapeFile <- sf::read_sf(here::here("data","clean","tigerFiles2020county.gpkg"))
+
+# (censusDf |> mutate(GEOID = as.character(GEOID))) |> left_join(countiesShapeFile) |> 
+#   filter(concept=="Area") |> 
+#   ggplot(aes(geometry=geom)) +
+#   geom_sf()+
+#     coord_sf(default_crs = NULL)
+
+censusDf |> filter(cleanedLabel == "populationDensity") |> 
+  ggplot(aes(x=NAME,y=value))+
+  geom_bar(stat='identity', fill=barColor,color=barOutlineColor)+
+  labs(y="Population Density",
+       x="",
+       caption = "Density is population/area(in square miles)")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+  
+
+```
+::::
+
+
+#### Population Descriptions
+:::: {.columns}
+:::{.row}
+```{r}
+#| label: popDescRaceTable
+pctVarName <- "Percentage of People"
+max_num <- acsDf |> 
+  filter(concept=="AGE AND SEX") |> 
+  filter(str_detect(cleanedLabel,"Total population"), !str_detect(cleanedLabel,"TotalTotal")) |> 
+  select(estimate) |> 
+  slice_max(
+    order_by = estimate,
+    n = 1
+  ) |>
+  pull(estimate)
+
+popPyramidData <- acsDf |> filter(concept=="AGE AND SEX") |> filter(str_detect(cleanedLabel,"Total population")) |> 
+  mutate(Sex = ifelse(str_detect(cleanedLabel,"Female"),"Female",
+                      ifelse(str_detect(cleanedLabel,"Male"),"Male",NA)),
+         AgeRange = str_remove(str_remove(str_remove(cleanedLabel, 
+                                                     "FemaleTotal populationAGE"),
+                                          "MaleTotal populationAGE"),
+                               "TotalTotal populationAGE"),
+         estimate=ifelse(Sex == "Female", -estimate, estimate),
+         AgeRange=factor(AgeRange, levels=c("Under 5 years",
+                                               "5 to 9 years",
+                                               "10 to 14 years", 
+                                                "15 to 19 years",   
+                                                "20 to 24 years",   
+                                                "25 to 29 years",   
+                                                "30 to 34 years",   
+                                                "35 to 39 years",   
+                                                "40 to 44 years",   
+                                                "45 to 49 years",   
+                                                "50 to 54 years",   
+                                                "55 to 59 years",   
+                                                "60 to 64 years",   
+                                                "65 to 69 years",   
+                                                "70 to 74 years",   
+                                                "75 to 79 years",   
+                                                "80 to 84 years",   
+                                                "85 years and over"
+                                               ))
+         ) |> 
+  rbind(
+    acsDf |> 
+      filter(concept=="AGE AND SEX") |> 
+      filter(str_detect(cleanedLabel,"Total population"),str_detect(cleanedLabel,"TotalTotal")) |> 
+      group_by(NAME,concept,year) |> summarize(estimate=sum(estimate)) |>   
+      mutate(cleanedLabel="Total",AgeRange=NA,Sex=NA)
+  ) |> 
+  addPercentVar(pctVarName, totalVarValue="Total", year=2020, valueVarName="estimate") |> 
+  mutate(`Percentage of People` = abs(`Percentage of People`)) |> 
+    filter(!is.na(AgeRange), !is.na(Sex)) 
+
+
+censusDf |> 
+  filter(concept=="RACE", !is.na(cleanedLabel)) |>
+  addPercentVar(pctVarName, totalVarValue="Total", year=2020, valueVarName="value") |> 
+  filter( cleanedLabel != "Total") |> 
+  select(NAME, year, cleanedLabel, value, any_of(pctVarName)) |> 
+DT::datatable(
+  colnames = c('Place' = 'NAME','Number of People' = 'value',
+               'Race Category' = 'cleanedLabel'),
+    elementId = paste0("DataTables_",tableId)
+  ) |> 
+  DT::formatCurrency('Number of People', currency = "", digits=0) |> 
+  DT::formatPercentage(pctVarName, digits=2)
+tableId <- tableId+1
+```
+``` {r}
+#| label: popAgeTable
+ 
+popPyramidData |> 
+  # pivot_wider(values_from = value, names_from = cleanedLabel) |> 
+  select(NAME, Sex, AgeRange, year, estimate, any_of(pctVarName)) |> 
+  mutate(estimate=abs(estimate)) |> 
+  DT::datatable(
+  colnames = c('Place' = 'NAME', 'Age Range' = 'AgeRange','Year'='year', 
+               'Number of People' = 'estimate'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  # DT::formatPercentage('Percentage of People', 0) |>
+  DT::formatCurrency('Number of People', currency = "", digits=0) |> 
+  DT::formatPercentage(pctVarName, digits=2)
+# Sex
+  tableId <- tableId+1
+```
+::::
+
+:::{.row}
+```{r}
+#| label: popRaceGraph
+censusDf |> filter(concept=="RACE", cleanedLabel != "Total", !is.na(cleanedLabel)) |> 
+  ggplot(aes(x=cleanedLabel, y=value, fill=NAME))+
+  geom_bar(stat="identity",position="dodge")+
+  labs(
+    x="Racial Category",
+    y="Estimated Population",
+    fill="Place"
+  )+
+  scale_y_continuous(
+    labels = scales::comma,
+    breaks = breaks_pretty()
+  )
+
+```
+
+
+
+``` {r}
+#| label: popPyramid
+population_pyramid_men <- popPyramidData |>
+  filter(Sex == "Male", NAME==str_c(currentCounty, " County")) |>
+  ggplot(aes(
+    x = estimate,
+    y = AgeRange
+    
+  )) +
+  geom_col(fill=etddBlueDark)+
+  annotate(
+    geom = "label",
+    x = 2*(max_num/3),
+    y = 17,
+    label = "Male",
+    fill = etddBlueDark,
+    color = "white",
+    label.padding = unit(0.3, "lines")
+  ) +
+  scale_x_continuous(
+    labels = scales::comma,
+    breaks = breaks_pretty(),
+    limits = c(0, max_num)
+  ) +
+  labs(x="",y="", caption=str_c("data for ", currentCounty))+
+  theme(
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank(),
+    axis.text.x = element_text(),
+    axis.line.y= element_blank(),
+    panel.grid.major.x = element_line(color = "grey90")
+  )
+population_pyramid_women <-
+  popPyramidData |>
+  filter(Sex == "Female", NAME==str_c(currentCounty, " County")) |>
+  ggplot(aes(
+    x = estimate,
+    y = AgeRange
+   
+  )) +
+  geom_col(fill = etddGreen) +
+  annotate(
+    geom = "label",
+    x =  -(2*(max_num/3)),
+    y = 17,
+    label = "Female",
+    fill = etddGreen,
+    color = "grey30",
+    
+    label.padding = unit(0.3, "lines")
+  ) +
+  scale_x_continuous(
+    labels = function(x) scales::comma(abs(x)),
+    breaks = breaks_pretty(),
+    limits = c(-max_num, 0)
+  ) +
+  labs(x="",y="")+
+  theme(
+    axis.title.y=element_blank(),
+    axis.text.y=element_blank(),
+    axis.ticks.y=element_blank(),
+    axis.text.x = element_text(),
+    axis.line.y= element_blank(),
+    panel.grid.major.x = element_line(color = "grey90")
+  )
+
+  age_labels_plot <-
+  popPyramidData |> 
+    select(AgeRange) |> distinct() |> 
+  ggplot(
+    aes(
+      x = 1,
+      y = AgeRange,
+      label = AgeRange
+    )
+  ) +
+  geom_text() +
+  theme_void()
+  
+  population_pyramid_women +
+  age_labels_plot +
+  population_pyramid_men +
+  plot_layout(
+    widths = c(7.5, 3.5, 7.5)
+  )
+# Race
+
+# Age (use pyramid for this?)
+
+
+```
+::::
+:::::
+#### Education
+::::{.columns}
+```{r}
+#| label: eduTable
+
+acsDf |> 
+  filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER"  &
+           cleanedLabel != "Other") |> 
+  addPercentVar(pctVarName, totalVarValue="Total", year=2020) |>
+  addPercentVar(pctVarName, totalVarValue="Total", year=2010) |>
+  select(-concept) |> 
+  DT::datatable(
+  colnames = c('Place' = 'NAME', 'Level of Education' = 'cleanedLabel', 'Number of People' = 'estimate', 'Year'='year'),
+    elementId = paste0("DataTables_",tableId)
+  ) |> 
+  DT::formatPercentage(pctVarName, 0) |>
+  DT::formatCurrency('Number of People', currency = "", digits=0)
+tableId <- tableId+1
+```
+
+```{r}
+#| label: eduGraph
+plotly::ggplotly(
+acsDf |> 
+     filter(concept == "SEX BY EDUCATIONAL ATTAINMENT FOR THE POPULATION 25 YEARS AND OVER", cleanedLabel!="Other",cleanedLabel!="Total") |> 
+  mutate(cleanedLabel = factor(cleanedLabel, levels=c(
+    "Less Than 9th Grade",
+    "9th to 12th Grade, No Diploma",
+    "Some College, No Degree",
+    "Associate's degree",
+    "Bachelor's degree",
+    "Graduate or Professional Degree"
+  ))) |> 
+     ggplot(aes(x=cleanedLabel, y=estimate, fill=NAME)) +
+     geom_bar(stat="identity", position="dodge")+
+  labs(x="Estimated Population",y="Education Category", fill="Place")+
+  scale_y_continuous(
+    labels = scales::comma,
+    breaks = breaks_pretty()
+  )
+)
+```
+:::::
+#### Housing Units by Year of Construction
+::::{.columns}
+```{r}
+#| label: constYearTable
+tmpDf <- acsDf |> filter(concept == "YEAR STRUCTURE BUILT") |> 
+  pivot_wider(
+    names_from = cleanedLabel,
+    values_from = estimate
+  ) |> 
+  select(-concept)
+varsWithAComma <- tmpDf |>  select(-NAME,-year) |> names()
+
+tmpDf |> 
+    relocate(Total, .after = last_col()) |> 
+  DT::datatable(
+    caption = "Housing Units by Year of Construction",
+  colnames = c('Place' = 'NAME', 'Year'='year'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  DT::formatCurrency(varsWithAComma, currency = "", digits=0)
+tableId <- tableId+1
+```
+
+```{r}
+#| label: constYearGraph
+
+acsDf |> 
+ filter(concept == "YEAR STRUCTURE BUILT" & cleanedLabel != "Total", cleanedLabel !="EstimateTotal") |> 
+  mutate(cleanedLabel=str_remove(cleanedLabel,"EstimateTotalBuilt ")) |> 
+ggplot(aes(x = NAME,
+           fill = cleanedLabel, y = estimate)) + 
+  geom_bar(position = "fill", stat = "identity") +
+  labs(y = "Percent", 
+       fill="Year Structure Built",
+       x = "",
+       title = "Year Structure Built by Place")+
+   scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::percent,
+     breaks=pretty_breaks()
+   )
+
+```
+:::::
+#### Housing Units by Type of Tenure
+::::{.columns}
+```{r}
+#| label: tenureTypeTable
+
+tmpDf <- acsDf |> filter(concept == "TENURE") |> 
+  pivot_wider(
+    names_from = cleanedLabel,
+    values_from = estimate
+  ) |> 
+  select(-concept)
+tmpDf |> 
+  DT::datatable(
+    
+  caption = "Housing Units by Tenure Status",
+  colnames = c('Place' = 'NAME'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  DT::formatCurrency(which(sapply(tmpDf,is.numeric)), currency = "", digits=0)
+tableId <- tableId+1
+```
+
+```{r}
+#| label: tenureTypeGraph
+acsDf |> filter(concept == "TENURE") |> 
+  ggplot(aes(x=NAME, y= estimate, fill = cleanedLabel)) +
+    geom_bar(position = position_dodge(preserve = "single"),stat="identity")+
+  labs(y="Estimated Number of Houses",
+       x="",
+       fill="Type of Tenure")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+```
+:::::
+
+### Economics{.tabset}
+#### Income Comparison
+::::{.columns}
+```{r}
+#| label: incomeTable
+varsWithAComma <- acsDf |> 
+  filter(concept == "PER CAPITA INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)" | concept == "INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)", cleanedLabel != "Other") |> 
+   select(-concept) |> 
+  pivot_wider(values_from = estimate,names_from = cleanedLabel) |> select(-NAME,-year) |> names()
+
+acsDf |> 
+  filter(concept == "PER CAPITA INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)" | concept == "INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)", cleanedLabel != "Other") |> 
+   select(-concept) |> 
+  pivot_wider(values_from = estimate,names_from = cleanedLabel)|> 
+  DT::datatable(
+  colnames = c('Place' = 'NAME', 'Year'='year'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  # DT::formatPercentage('Percentage of People', 0) |>
+  DT::formatCurrency(varsWithAComma, currency = "", digits=0)
+tableId <- tableId+1
+```
+
+``` {r}
+#| label: incomeGraph
+acsDf |> 
+  filter(concept == "PER CAPITA INCOME IN THE PAST 12 MONTHS (IN 2020 INFLATION-ADJUSTED DOLLARS)") |> 
+  ggplot(aes(x=estimate, y=reorder(NAME, estimate))) +
+  geom_point(color="blue", size = 2) +
+  geom_segment(aes(x = 40, 
+               xend = estimate, 
+               y = reorder(NAME, estimate), 
+               yend = reorder(NAME, estimate)),
+               color = "lightgrey") +
+  labs (x = "Income (per capita)",
+        y = "",
+        title = "Income by Municipality",
+        subtitle = str_c("(",currentCounty," County)")) +
+  theme_minimal() + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())+
+   scale_x_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+```
+:::::
+
+#### Povery Status
+::::{.columns}
+```{r}
+#| label: povertyTable
+acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel == "Above Poverty" | cleanedLabel == "Below Poverty") |> 
+  select(NAME,cleanedLabel,year,estimate) |> 
+  pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
+DT::datatable(
+    colnames = c('Place' = 'NAME', 'Year'='year'),
+      elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  # DT::formatPercentage('Percentage of People', 0) |>
+  DT::formatCurrency('Above Poverty', currency = "", digits=0) |> 
+  DT::formatCurrency('Below Poverty', currency = "", digits=0)
+tableId <- tableId+1
+```
+
+```{r}
+#| label: povertyGraph
+acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel == "Above Poverty" | cleanedLabel == "Below Poverty") |> 
+  ggplot(aes(x=NAME, y=estimate, fill=cleanedLabel))+
+  geom_bar(stat = "identity", position = "dodge")+
+  labs(y="Estimated Number of Families",
+       x="",
+       fill="Poverty Status")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+  
+
+```
+:::::
+
+#### Poverty Status by Family Type
+::::{.columns}
+```{r}
+#| label: povertyFamilyTable
+pctVarName = "Percentage of Families"
+# All Families, Families Headed by Females, Headed by Female with Related Children under 18
+acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel != "Other", cleanedLabel != "Total") |> 
+  select(NAME,cleanedLabel,year,estimate) |> 
+  mutate(`Poverty Status` = ifelse(str_detect(cleanedLabel,"Above Poverty"),"Above Poverty","Below Poverty"),
+         `Family Type` = case_when(
+           str_detect(cleanedLabel, "Female Householder with related children")
+           ~ "Female Householder with related children",
+           str_detect(cleanedLabel,"Female Householder")
+           ~ "Female Householder",
+           .default="All Families"
+         )
+  ) |> 
+  select(-cleanedLabel) |>
+  relocate(estimate, .after = last_col()) |> 
+  relocate(year, .after = last_col()) |> 
+    addPercentVar(pctVarName, totalVarValue="All Families", totalVarName = "Family Type", year=2020) |>
+  addPercentVar(pctVarName, totalVarValue="All Families", totalVarName = "Family Type", year=2010) |>
+  # pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
+DT::datatable(
+  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Families'='estimate'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  # DT::formatPercentage('Percentage of People', 0) |>
+  # DT::formatCurrency('Above Poverty', currency = "", digits=0) |> 
+  DT::formatCurrency('Number of Families', currency = "", digits=0) |> 
+  DT::formatPercentage(pctVarName, digits=2)
+tableId <- tableId+1
+```
+
+```{r}
+#| label: povertyFamilyGraph
+acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel != "Other") |> 
+  select(NAME,cleanedLabel,year,estimate) |> 
+   mutate(`Poverty Status` = ifelse(str_detect(cleanedLabel,"Above Poverty"),"Above Poverty","Below Poverty"),
+         `Family Type` = case_when(
+           str_detect(cleanedLabel, "Female Householder with related children")
+           ~ "Female Householder with related children",
+           str_detect(cleanedLabel,"Female Householder")
+           ~ "Female Householder",
+           .default="All Other Families"
+         )
+  ) |> 
+  ggplot(aes(x=`Poverty Status`,y=estimate,fill=`Family Type`))+
+  geom_bar(stat="identity", position="stack")+
+  labs(y="Estimated Number of Families",
+       x="",
+       fill="Family Type")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+```
+:::::
+
+#### Employment by Industry
+::::{.columns}
+```{r}
+#| label: empTable
+
+topIndustries <- acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total", year==currReportYear) |> 
+  mutate(cleanedLabel = str_remove(cleanedLabel,"([\\w\\s\\,&]*:\\s?)")) |> 
+  select(-concept) |> 
+  group_by(cleanedLabel) |>
+  summarize(numberOfJobs=sum(estimate)) |> 
+  arrange(desc(numberOfJobs)) |> 
+  top_n(numberOfTopIndustries) |> 
+  select(cleanedLabel) |> 
+  pull()
+
+pctVarName <- "Percentage of Jobs"
+
+acsDf |> 
+filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other") |> 
+  mutate(cleanedLabel = str_remove(cleanedLabel,"([\\w\\s\\,&]*:\\s?)"),
+         cleanedLabel = ifelse(cleanedLabel %in% topIndustries | cleanedLabel == "Total", cleanedLabel, "Other Industries")) |> 
+  group_by(NAME,cleanedLabel,year) |> 
+  summarize(estimate=sum(estimate)) |> 
+  addPercentVar(pctVarName, totalVarValue="Total", year=2020) |> 
+  addPercentVar(pctVarName, totalVarValue="Total", year=2010) |> 
+  filter(cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
+DT::datatable(
+  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate', 'Industry'='cleanedLabel'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  DT::formatCurrency('Number of Jobs', currency='', digits=0) |> 
+  DT::formatPercentage(pctVarName,digits=2)
+tableId <- tableId+1
+```
+
+```{r}
+#| label: empGraph
+plotly::ggplotly(
+acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" & cleanedLabel != "EstimateTotal" & cleanedLabel != "Total",year==currReportYear) |> 
+  mutate(cleanedLabel = str_remove(cleanedLabel,"([\\w\\s\\,&]*:\\s?)"),
+         cleanedLabel = ifelse(cleanedLabel %in% topIndustries, cleanedLabel, "Other Industries")) |> 
+  group_by(NAME,cleanedLabel,year) |> 
+  summarize(estimate=sum(estimate)) |> 
+  ggplot(aes(y=estimate, x=NAME, fill = cleanedLabel))+
+  geom_bar(stat = "identity", position = "dodge")+
+  theme(legend.position = "none")+
+  labs(y="Estimated Number of Workers",
+       x="Place",
+       fill="Type of Tenure")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+)
+
+```
+:::::
+
+#### Employment by Industry (Historical)
+::::{.columns}
+```{r}
+#| label: empHistTable
+
+acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 16 YEARS AND OVER" & cleanedLabel != "Other" ) |> 
+  mutate(cleanedLabel = str_remove(cleanedLabel,"(:[\\w\\s,&]*)")) |> 
+  select(-concept) |> 
+  group_by(NAME,year,cleanedLabel) |> 
+  summarize(estimate=sum(estimate)) |> 
+  ungroup() |> 
+  addPercentVar(pctVarName, totalVarValue="Total", year=2020) |> 
+  addPercentVar(pctVarName, totalVarValue="Total", year=2010) |> 
+  filter(cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
+DT::datatable(
+  colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate', 'Industry'='cleanedLabel'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  DT::formatCurrency('Number of Jobs', currency='', digits=0) |> 
+  DT::formatPercentage(pctVarName, digits=2)
+tableId <- tableId+1
+```
+:::::
+#### Labor Force by Place of Work
+::::{.columns}
+```{r}
+#| label: placeWorkTable
+
+acsDf |> 
+  filter(concept=="MEANS OF TRANSPORTATION TO WORK BY PLACE OF WORK--STATE AND COUNTY LEVEL", cleanedLabel!="Other", cleanedLabel !="Total") |>
+  select(-concept) |> 
+  pivot_wider(values_from = estimate,names_from = cleanedLabel) |> 
+  
+DT::datatable(
+    colnames = c('Place' = 'NAME', 'Year'='year'),
+      elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  DT::formatCurrency('Work Out Of State', currency='', digits=0) |> 
+  DT::formatCurrency('Work Out of County of Residence', currency='', digits=0) |> 
+  DT::formatCurrency('Work in County of Residence', currency='', digits=0) 
+tableId <- tableId+1
+```
+
+```{r}
+#| label: placeWorkGraph
+
+plotly::ggplotly(
+acsDf |> filter(concept=="MEANS OF TRANSPORTATION TO WORK BY PLACE OF WORK--STATE AND COUNTY LEVEL", cleanedLabel!="Other",cleanedLabel !="Total") |> 
+  ggplot(aes(x=cleanedLabel,y=estimate,fill=NAME))+
+  geom_bar(stat="identity",color=barOutlineColor, position="dodge")+
+  labs(y="Estimated Number of Workers",
+       x="",
+       fill="Place of Work")+
+  scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )
+)
+```
+:::::
+#### Commuting Patterns
+::::{.columns}
+```{r}
+#| label: commutingTables
+
+pctVars <- c("percentageOfJobs")
+pctWholeVars <- c("")
+
+empDataWorkSubset |> 
+  bind_rows(totalWork) |> 
+ DT::datatable(
+  caption = str_c(currentCounty," County laborers by counties where laborers reside"),
+  colnames = c('Home County' = 'homeCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs', 'Year'='year'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  DT::formatPercentage('Percentage of Jobs', 0) |> 
+  DT::formatCurrency('Number of Jobs', currency = "", digits=0)
+empDataHomeSubset |> 
+  bind_rows(totalHome) |> 
+ DT::datatable(
+  caption = str_c(currentCounty," County residents by counties where residents work"),
+  colnames = c('Work County' = 'workCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs','Year'='year'),
+    elementId = paste0("DataTables_",tableId)
+
+  ) |> 
+  DT::formatPercentage('Percentage of Jobs', 0) |> 
+  DT::formatCurrency('Number of Jobs', currency = "", digits=0)
+tableId <- tableId+1
+```
+
+``` {r}
+#| label: commutingGraphs
+plotly::ggplotly(
+(empDataWorkSubset |> 
+    filter(year==currReportYear) |> 
+  ggplot(aes(x=homeCountyName,y=numberOfJobs)) +
+  geom_bar(stat = "identity",fill=barColor,color=barOutlineColor)+
+  labs(x = "Home County", 
+       y = "Number of Jobs", 
+       title = "Number of Jobs by County")+
+     scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )) 
+  )
+
+plotly::ggplotly(
+(empDataHomeSubset |> 
+    filter(year==currReportYear) |> 
+  ggplot(aes(x=workCountyName,y=numberOfJobs)) +
+  geom_bar(stat = "identity",fill=barColor,color=barOutlineColor)+
+  labs(x = "Work County", 
+       y = "Number of Jobs", 
+       title = "Number of Jobs by County")+
+     scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   )) 
+  )
+```
+:::::
+
