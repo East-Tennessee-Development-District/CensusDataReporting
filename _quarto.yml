@@ -42,14 +42,14 @@ website:
 #         href: DataDescription.qmd 
 bibliography: resources/references.bib
 csl: resources/chicago-notes-intext-bibliography-access-dates.csl
-  
+
 logo:
   small: /resources/ETDDLogo.svg
   medium: /resources/ETDDLogo.svg
 format: 
   dashboard:
     css: resources/custom.css
-    embed-resources: true
+    embed-resources: true   
     orientation: rows
     theme: 
         light: flatly

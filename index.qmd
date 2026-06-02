@@ -28,6 +28,7 @@ Some graphs are interactive- if you hover your mouse over them you will notice c
 - Missing data export option for tables
 - Raw labels for data in interactive graphs
 - Some tables and graphs missing data sources
+- Dark mode breaks some table's readability
 
 ### Anticipated improvements
 
@@ -35,3 +36,4 @@ Some graphs are interactive- if you hover your mouse over them you will notice c
 - Include option for patterns instead of colors on graphs
 - Include ability to export tables easily
 - Include District-wide view
+- Improve styling
