@@ -1,0 +1,261 @@
+[
+  {
+    "objectID": "reports/dataSources.html",
+    "href": "reports/dataSources.html",
+    "title": "Data Description",
+    "section": "",
+    "text": "Please note: a full description of these data sources will be provided at a later date."
+  },
+  {
+    "objectID": "reports/dataSources.html#packages-used",
+    "href": "reports/dataSources.html#packages-used",
+    "title": "Data Description",
+    "section": "Packages used",
+    "text": "Packages used\nPlease note: this list is currently incomplete and will be updated at a later date\nKyle Walker and Matt Herman Tidycensus: Load US Census Boundary and Attribute Data as ’Tidyverse’ and ’Sf’-Ready Data Frames (2026), https://walker-data.com/tidycensus/.\nGreg Freedman Ellis et al. Ipumsr: An r Interface for Downloading, Reading, and Handling IPUMS Data (2026), https://tech.popdata.org/ipumsr/."
+  },
+  {
+    "objectID": "reports/dataSources.html#data-management",
+    "href": "reports/dataSources.html#data-management",
+    "title": "Data Description",
+    "section": "Data Management",
+    "text": "Data Management\nHigh level description: ACS and Census column labels were cleaned to standardize them and prepare them for analysis and place names were changed to a more readable form. The data was subset to only those counties in ETDD’s counties.\nTiger files were used to get the area of each municipality and county. The area was converted into square miles and combined with the census data population to get population density. The data was subset to only those counties in ETDD’s counties.\nIPUMS data was subset, the column names were changed, and changes from year to year were calculated and added to the data.\nLODES data was combined at the county level and the crosswalk was used to add the correct label for each county."
+  },
+  {
+    "objectID": "reports/Union.html",
+    "href": "reports/Union.html",
+    "title": "Union",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Union County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Union.html#column",
+    "href": "reports/Union.html#column",
+    "title": "Union",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Union County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Scott.html",
+    "href": "reports/Scott.html",
+    "title": "Scott",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Scott County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Scott.html#column",
+    "href": "reports/Scott.html#column",
+    "title": "Scott",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Scott County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Morgan.html",
+    "href": "reports/Morgan.html",
+    "title": "Morgan",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Morgan County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Morgan.html#column",
+    "href": "reports/Morgan.html#column",
+    "title": "Morgan",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Morgan County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Loudon.html",
+    "href": "reports/Loudon.html",
+    "title": "Loudon",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Loudon County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Loudon.html#column",
+    "href": "reports/Loudon.html#column",
+    "title": "Loudon",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Loudon County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Jefferson.html",
+    "href": "reports/Jefferson.html",
+    "title": "Jefferson",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Jefferson County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Jefferson.html#column",
+    "href": "reports/Jefferson.html#column",
+    "title": "Jefferson",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Jefferson County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Grainger.html",
+    "href": "reports/Grainger.html",
+    "title": "Grainger",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Grainger County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Grainger.html#column",
+    "href": "reports/Grainger.html#column",
+    "title": "Grainger",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Grainger County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Claiborne.html",
+    "href": "reports/Claiborne.html",
+    "title": "Claiborne",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Claiborne County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Claiborne.html#column",
+    "href": "reports/Claiborne.html#column",
+    "title": "Claiborne",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Claiborne County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Blount.html",
+    "href": "reports/Blount.html",
+    "title": "Blount",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Blount County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Blount.html#column",
+    "href": "reports/Blount.html#column",
+    "title": "Blount",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Blount County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Anderson.html",
+    "href": "reports/Anderson.html",
+    "title": "Anderson",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Anderson County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Anderson.html#column",
+    "href": "reports/Anderson.html#column",
+    "title": "Anderson",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Anderson County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Campbell.html",
+    "href": "reports/Campbell.html",
+    "title": "Campbell",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Campbell County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Campbell.html#column",
+    "href": "reports/Campbell.html#column",
+    "title": "Campbell",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Campbell County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Cocke.html",
+    "href": "reports/Cocke.html",
+    "title": "Cocke",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Cocke County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Cocke.html#column",
+    "href": "reports/Cocke.html#column",
+    "title": "Cocke",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Cocke County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Hamblen.html",
+    "href": "reports/Hamblen.html",
+    "title": "Hamblen",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Hamblen County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Hamblen.html#column",
+    "href": "reports/Hamblen.html#column",
+    "title": "Hamblen",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Hamblen County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Knox.html",
+    "href": "reports/Knox.html",
+    "title": "Knox",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Knox County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Knox.html#column",
+    "href": "reports/Knox.html#column",
+    "title": "Knox",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Knox County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Monroe.html",
+    "href": "reports/Monroe.html",
+    "title": "Monroe",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Monroe County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Monroe.html#column",
+    "href": "reports/Monroe.html#column",
+    "title": "Monroe",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Monroe County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Roane.html",
+    "href": "reports/Roane.html",
+    "title": "Roane",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Roane County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Roane.html#column",
+    "href": "reports/Roane.html#column",
+    "title": "Roane",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Roane County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Sevier.html",
+    "href": "reports/Sevier.html",
+    "title": "Sevier",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Sevier County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "reports/Sevier.html#column",
+    "href": "reports/Sevier.html#column",
+    "title": "Sevier",
+    "section": "",
+    "text": "PUT MAP HERE\nINTRODUCTION This report is part of a series, which examines statistical data from U.S. Census materials regarding economic and demographic characteristics in the sixteen counties that make up the East Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.\nTopics that will be discussed in this summary report for Sevier County are • population growth from 1950 to 2020; • population density; • demographic characteristics in terms of sex, race, and age; • economic characteristics in terms of family income, household income, per capita income, and poverty status of families; • employment classification according to industry; • labor force characteristics in terms of place of work and commuting patterns; • educational level of the adult population; • and housing characteristics in terms of age of the housing stock and type of tenure."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "Home",
+    "section": "",
+    "text": "This is the ETDD Census Reporting Dashboard for our counties. It is currently not complete.\n\n\nHover over “Counties”, then click on the county you want information for\nClick on the tab for the category of information you want\nClick on the tab for the table and graph you want\nSome graphs are interactive- if you hover your mouse over them you will notice controls like zooming in or out. You can hover over data points to get the exact numbers and category label (which are also in the corresponding table). You can click and drag to limit the graph to a smaller part of the overall data. On some graphs, if you click on the color boxes to the side you can show/hide some of the categories in the graph.\n\n\n\n\nOverlapping axis labels\nInconsistency between interactive vs static graphs\nMissing accessibility check on drop down\nMissing Data Description\nIntroduction on each dashboard requires rewriting + formatting\nMissing map on each dashboard\nMissing details on Data Sources\nMissing data export option for tables\nRaw labels for data in interactive graphs\nSome tables and graphs missing data sources\n\n\n\n\n\nInclude more interactivity (Shiny)\nInclude option for patterns instead of colors on graphs\nInclude ability to export tables easily\nInclude District-wide view"
+  },
+  {
+    "objectID": "index.html#etdd-census-reporting",
+    "href": "index.html#etdd-census-reporting",
+    "title": "Home",
+    "section": "",
+    "text": "This is the ETDD Census Reporting Dashboard for our counties. It is currently not complete.\n\n\nHover over “Counties”, then click on the county you want information for\nClick on the tab for the category of information you want\nClick on the tab for the table and graph you want\nSome graphs are interactive- if you hover your mouse over them you will notice controls like zooming in or out. You can hover over data points to get the exact numbers and category label (which are also in the corresponding table). You can click and drag to limit the graph to a smaller part of the overall data. On some graphs, if you click on the color boxes to the side you can show/hide some of the categories in the graph.\n\n\n\n\nOverlapping axis labels\nInconsistency between interactive vs static graphs\nMissing accessibility check on drop down\nMissing Data Description\nIntroduction on each dashboard requires rewriting + formatting\nMissing map on each dashboard\nMissing details on Data Sources\nMissing data export option for tables\nRaw labels for data in interactive graphs\nSome tables and graphs missing data sources\n\n\n\n\n\nInclude more interactivity (Shiny)\nInclude option for patterns instead of colors on graphs\nInclude ability to export tables easily\nInclude District-wide view"
+  }
+]
