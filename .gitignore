@@ -1,6 +1,9 @@
 # census api file
 scripts/secrets.R
 
+reports/*_files
+reports/*.html
+
 # History files
 .Rhistory
 .Rapp.history
@@ -53,3 +56,5 @@ rsconnect/
 
 # random win files
 desktop.ini
+/.quarto/
+**/*.quarto_ipynb

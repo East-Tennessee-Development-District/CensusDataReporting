@@ -1,0 +1,37 @@
+---
+title: "Home"
+format: html
+---
+
+## ETDD Census Reporting
+
+This is the ETDD Census Reporting Dashboard for our counties. It is currently not complete.
+
+### How to use
+Hover over "Counties", then click on the county you want information for
+
+Click on the tab for the category of information you want
+
+Click on the tab for the table and graph you want
+
+Some graphs are interactive- if you hover your mouse over them you will notice controls like zooming in or out. You can hover over data points to get the exact numbers and category label (which are also in the corresponding table). You can click and drag to limit the graph to a smaller part of the overall data. On some graphs, if you click on the color boxes to the side you can show/hide some of the categories in the graph.
+
+### Known issues
+
+- Overlapping axis labels
+- Inconsistency between interactive vs static graphs
+- Missing accessibility check on drop down
+- Missing Data Description
+- Introduction on each dashboard requires rewriting + formatting
+- Missing map on each dashboard
+- Missing details on Data Sources
+- Missing data export option for tables
+- Raw labels for data in interactive graphs
+- Some tables and graphs missing data sources
+
+### Anticipated improvements
+
+- Include more interactivity (Shiny)
+- Include option for patterns instead of colors on graphs
+- Include ability to export tables easily
+- Include District-wide view

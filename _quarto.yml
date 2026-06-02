@@ -1,0 +1,65 @@
+project:
+  render:
+    - index.qmd
+    - "reports/*.qmd"
+    # - reports/Anderson.qmd
+    # - reports/Blount.qmd
+    # - reports/Campbell.qmd
+    # - reports/Claiborne.qmd
+  output-dir: docs
+  type: website
+
+website:
+  navbar:
+    background: primary
+    search: true
+    left:
+      - text: ETDD Census Data
+      - index.qmd
+      - reports/dataSources.qmd
+      - text: "Counties"
+        menu:
+          - reports/Anderson.qmd
+          - reports/Blount.qmd
+          - reports/Campbell.qmd
+          - reports/Claiborne.qmd
+          - reports/Cocke.qmd
+          - reports/Grainger.qmd
+          - reports/Hamblen.qmd
+          - reports/Jefferson.qmd
+          - reports/Knox.qmd
+          - reports/Loudon.qmd
+          - reports/Monroe.qmd
+          - reports/Morgan.qmd
+          - reports/Roane.qmd
+          - reports/Scott.qmd
+          - reports/Sevier.qmd
+          - reports/Union.qmd
+          
+#       - text: "Overview"
+#         href: Overview.qmd
+#       - text: "Data Description"
+#         href: DataDescription.qmd 
+bibliography: resources/references.bib
+csl: resources/chicago-notes-intext-bibliography-access-dates.csl
+  
+logo:
+  small: /resources/ETDDLogo.svg
+  medium: /resources/ETDDLogo.svg
+format: 
+  dashboard:
+    css: resources/custom.css
+    embed-resources: true
+    orientation: rows
+    theme: 
+        light: flatly
+        dark: darkly
+    scrolling: true
+    echo: false
+  html:
+    css: resources/custom.css
+    theme:
+      light: flatly
+      dark: darkly
+execute: 
+  cache: true
