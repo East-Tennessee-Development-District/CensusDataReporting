@@ -9,7 +9,6 @@ project:
     # - reports/Claiborne.qmd
   output-dir: docs
   type: website
-
 profile:
   default: dev
 website:
@@ -44,7 +43,7 @@ website:
 #       - text: "Data Description"
 #         href: DataDescription.qmd 
 bibliography: resources/references.bib
-csl: resources/chicago-notes-intext-bibliography-access-dates.csl
+csl: resources/chicago-notes-bibliography-access-dates.csl
 
 logo:
   small: /resources/ETDDLogo.svg

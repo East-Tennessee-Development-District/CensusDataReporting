@@ -1,13 +1,24 @@
 ---
 title: "Data Description"
 format: html
+csl: ../resources/chicago-notes-intext-bibliography-access-dates.csl
 ---
 
 Please note: a full description of these data sources will be provided at a later date.
 
 # Sources Used
 
+@ACS_2020
 
+@ACS_2010
+
+@Census_2020
+
+@Census_2010
+
+@lodes
+
+@tigerFiles
 U.S. Census Bureau, “American Community Survey 5-Year Estimates: Comparison Profiles 5-Year,” 2020, <http://api.census.gov/data/2020/acs/acs5>, accessed on July 2, 2026.
 
 U.S. Census Bureau, “American Community Survey 5-Year Estimates: Comparison Profiles 5-Year,” 2010, <http://api.census.gov/data/2010/acs/acs5>, accessed on July 2, 2026.
