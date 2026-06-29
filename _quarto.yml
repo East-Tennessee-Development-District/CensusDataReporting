@@ -10,6 +10,8 @@ project:
   output-dir: docs
   type: website
 
+profile:
+  default: dev
 website:
   navbar:
     background: primary

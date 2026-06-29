@@ -1,6 +1,9 @@
 # census api file
 scripts/secrets.R
 
+# dev folder
+dev/*
+
 reports/*_files
 reports/*.html
 
