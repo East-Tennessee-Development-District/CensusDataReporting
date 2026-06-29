@@ -1,4 +1,5 @@
 project:
+  pre-render: scripts/preRender.py
   render:
     - index.qmd
     - "reports/*.qmd"
