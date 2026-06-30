@@ -1,0 +1,3 @@
+[submodule "common_shared_assets"]
+	path = common_shared_assets
+	url = https://github.com/East-Tennessee-Development-District/common_shared_assets.git
