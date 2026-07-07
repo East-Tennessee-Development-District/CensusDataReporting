@@ -6,6 +6,23 @@ format: html
 ## ETDD Census Reporting
 
 This is the ETDD Census Reporting Dashboard for our counties. It is currently not complete.
+This report examines statistical data from U.S. Census materials with a focus on economic and demographic characteristics for the 16 counties that make up the East Tennessee Development District. It uses data from the U.S. Decennial Census and American Community Survey Five-year Estimates as its primary sources, with supplemental material from the National Historical Geographic Information System and the LEHD Origin-Destination Employment Statistics (LODES). Please see the Data Description Tab for a detailed list of where the data comes from.
+
+## Data in Each Sub-Dashboard
+
+Topics that will be discussed in the summary report for each county are
+- Demographic Characteristics
+  - Population growth from 1970 to 2020;
+  - population density
+  - sex, race, and age
+  - educational level of the adult population
+  - housing characteristics in terms of age of the housing stock and type of tenure
+- Economic Characteristics
+  - family income, household income, per capita income,
+  - poverty status of families;
+  - employment classification according to industry;
+  - labor force by place of work and commuting patterns;
+
 
 ### How to use
 Hover over "Counties", then click on the county you want information for

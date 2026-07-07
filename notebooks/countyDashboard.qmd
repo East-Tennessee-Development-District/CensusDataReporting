@@ -171,24 +171,40 @@ options(DT.options = list(filter="top",
 ## Column {.tabset}
 ### Description
 
-PUT MAP HERE
-
-INTRODUCTION
-This report is part of a series, which examines statistical data from U.S. Census materials regarding
-economic and demographic characteristics in the sixteen counties that make up the East
-Tennessee Development District. The series utilizes data from U.S. Decennial Censuses along with
-American Community Survey Five-year Estimates as its primary sources. Please see the Data Description Tab for a detailed list of where the data comes from.
-
 Topics that will be discussed in this summary report for `r currentCounty` County are
-• population growth from 1950 to 2020;
-• population density;
-• demographic characteristics in terms of sex, race, and age;
-• economic characteristics in terms of family income, household income, per capita income,
-and poverty status of families;
-• employment classification according to industry;
-• labor force characteristics in terms of place of work and commuting patterns;
-• educational level of the adult population;
-• and housing characteristics in terms of age of the housing stock and type of tenure.
+
+- Demographic Characteristics
+  - Population growth from 1970 to 2020;
+  - population density
+  - sex, race, and age
+  - educational level of the adult population
+  - housing characteristics in terms of age of the housing stock and type of tenure
+- Economic Characteristics
+  - family income, household income, per capita income,
+  - poverty status of families;
+  - employment classification according to industry;
+  - labor force by place of work and commuting patterns;
+
+For more details on the data used, please see the Data Description tab.
+
+### Map
+```{r}
+#| fig.alt: paste("A map showing the sixteen counties in ETDD with ", currentCounty, " highlighted.")
+
+# plotly::ggplotly(
+  countiesShapeFile |> 
+  mutate(areaOfInterest=ifelse(NAME==currentCounty,1,0)) |> 
+  filter(NAME %in% countiesInETDDNameOnly) |> 
+  ggplot(aes(geometry=geom, fill=as.factor(areaOfInterest))) +
+  geom_sf() +
+  theme_void() +
+  geom_sf_text(aes(label=NAME), size=3, color="white") +
+  scale_fill_manual(values=c(etddGreenOnWhite, etddBlue)) +
+  theme(legend.position = "none") +
+  labs(
+  alt = paste("A map showing the sixteen counties in ETDD with ", currentCounty, " highlighted.")
+)
+  # )
 
 ### Demographics {.tabset}
 
