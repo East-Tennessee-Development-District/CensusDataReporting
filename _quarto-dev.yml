@@ -1,2 +1,9 @@
 project:
   output-dir: dev
+format:
+  html:
+    axe: 
+      output: document 
+  dashboard:
+    axe: 
+      output: document 
