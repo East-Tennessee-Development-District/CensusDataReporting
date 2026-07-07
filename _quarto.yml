@@ -43,25 +43,23 @@ website:
 #       - text: "Data Description"
 #         href: DataDescription.qmd 
 bibliography: resources/references.bib
-csl: resources/chicago-notes-bibliography-access-dates.csl
+csl: common_shared_assets/citations/chicago-notes-bibliography-access-dates.csl
 
 logo:
-  small: /resources/ETDDLogo.svg
-  medium: /resources/ETDDLogo.svg
+  small: common_shared_assets/assets/ETDDLogo.svg
+  medium: common_shared_assets/assets/ETDDLogo.svg
 format: 
   dashboard:
-    css: resources/custom.css
+    css: common_shared_assets/stylesheets/custom.css
     embed-resources: true   
     orientation: rows
     theme: 
-        light: flatly
-        dark: darkly
+        light: [common_shared_assets/stylesheets/custom.scss,flatly]
     scrolling: true
     echo: false
   html:
-    css: resources/custom.css
+    css: common_shared_assets/stylesheets/custom.css
     theme:
-      light: flatly
-      dark: darkly
+      light: [common_shared_assets/stylesheets/custom.scss,flatly]
 execute: 
   cache: true
