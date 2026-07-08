@@ -44,7 +44,12 @@ countiesInETDD=[
   "Sevier",
   "Union"
 ]
+
+
 for county in countiesInETDD:
-  fileName=os.path.join(os.getcwd(),os.getenv("QUARTO_PROJECT_OUTPUT_DIR"),"reports",str(county)+".html")
+  if os.getenv("QUARTO_PROJECT_OUTPUT_DIR") is not None:
+    fileName=os.path.join(os.getcwd(),os.getenv("QUARTO_PROJECT_OUTPUT_DIR"),"reports",str(county)+".html")  
+  else:
+    fileName=os.path.join(os.getcwd(),"dev","reports",str(county)+".html")
   if os.path.isfile(fileName):
     fixA11yIssues(fileName)
