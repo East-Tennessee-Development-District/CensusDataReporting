@@ -4,7 +4,11 @@ if (exists("startrun")) {
   source(here::here("scripts","startHere.R"))
 }
 
-
+if (file.exists(here::here("scripts","citations.R"))) {
+  source(here::here("scripts","citations.R"))
+} else {
+  print("Please run pre-render script or create citations.R manually")
+}
 
 # || Variables
 options(tigris_use_cache = TRUE)
@@ -12,6 +16,8 @@ reset <- FALSE
 numberOfTopCounties <- 5
 numberOfTopIndustries <- 5
 state <- "tn"
+
+nhgisCitation <- "IPUMS NHGIS, University of Minnesota, www.nhgis.org "
 
 cityTownRegex <- "(CDP)?(city)?(town)?"
 cityTownTNRegex <- str_c("\\s?",cityTownRegex,"\\s?, TN")
@@ -453,5 +459,15 @@ addPercentVar <- function(df, percentVarName, valueVarName = "estimate", totalVa
     )
 }
 
+addPlotlyCaption <- function(plot,captionText,xVal=1,yVal=-0.5){
+  return(plot |> plotly::layout(annotations = 
+                   list(x = xVal, y = yVal, text = captionText, 
+                        xref="paper", yref="paper",
+                        showarrow=FALSE,
+                        xanchor='right', yanchor='bottom',
+                        font=list(size=15)),
+                 margin = list(b=150)
+  ))
+}
 # || Final
 fxsVarsrun <- TRUE
