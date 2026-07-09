@@ -176,6 +176,7 @@ options(DT.options = list(filter="top",
     "}")
     )))
 library(shiny)
+
 ```
 
 
@@ -288,7 +289,7 @@ censusDf |> filter(cleanedLabel=="area" | cleanedLabel == "populationDensity") |
   mutate(NAME=ifelse(NAME=="Rocky Top","Rocky Top(a)",NAME)) |> 
   select(-GEOID,-concept, -year) |> 
   DT::datatable(
-    caption = "Density is population / area (in square miles); source: @Census_2020 and @Census_2010",
+    caption = str_c("Density is population / area (in square miles); source: ",Census_2010Cite," and ",Census_2020Cite),
   colnames = c('Place' = 'NAME', 'Population Density' = 'populationDensity','Area'='area'),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -302,29 +303,29 @@ tableId <- tableId+1
 #| label: popDensityFig
 #| fig.alt: "A bar graph showing the population density data"
 
-# plotlyOutput(outputId = paste0("plot_",tableId))
-# (censusDf |> mutate(GEOID = as.character(GEOID))) |> left_join(countiesShapeFile) |> 
-#   filter(concept=="Area") |> 
-#   ggplot(aes(geometry=geom)) +
-#   geom_sf()+
-#     coord_sf(default_crs = NULL)
+# longestLabel=censusDf |> select(NAME) |> distinct() |> mutate(len=str_length(NAME)) |> 
+#   slice_max(order_by = len,n=1) |> select(len) |> pull()
+# longestAxis=longestLabel*12*0.6*sin(45)
+
 (
 plotly::ggplotly((censusDf |> filter(cleanedLabel == "populationDensity") |> 
   ggplot(aes(x=NAME,y=value))+
   geom_bar(stat='identity', fill=barColor,color=barOutlineColor)+
   labs(y="Population Density",
        x="",
-       caption = "Density is population/area(in square miles)")+
-  # scale_x_discrete(guide = guide_axis(n.dodge=3))+
+       caption = str_c("Density is population / area (in square miles); source: ",Census_2020Cite))+
+  # annotate("text",x = 1, y = -1, hjust=100, vjust=-50,
+           # label="Density is population / area (in square miles); source: @Census_2020")+
    scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
    )), elementId= "TEST"
   )
 ) |>
-  addPlotlyCaption(captionText="Density is population / area (in square miles); source: @Census_2020.")
+  addPlotlyCaption(captionText=str_c("Density is population / area (in square miles); source: ",Census_2020Cite))
   # plotly::add_annotations(text = "Density is population / area (in square miles); source: @Census_2020.")
   
+
 
 ```
 ::::
@@ -411,7 +412,7 @@ popPyramidData |>
   DT::datatable(
   colnames = c('Place' = 'NAME', 'Age Range' = 'AgeRange','Year'='year', 
                'Number of People' = 'estimate'),
-  caption = "source: @Census_2020 and @Census_2010",
+  caption = str_c("source: ",Census_2010Cite," and ",Census_2020Cite),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
   ) |> 
@@ -441,7 +442,7 @@ plotly::ggplotly( censusDf |> filter(concept=="RACE", cleanedLabel != "Total", !
     breaks = breaks_pretty()
   )
 )|>
-  addPlotlyCaption(captionText="Density is population / area (in square miles); source: @Census_2020.")
+  addPlotlyCaption(captionText=str_c("Density is population / area (in square miles); source: ",Census_2020Cite))
 
 ```
 
@@ -506,7 +507,7 @@ population_pyramid_women <-
     breaks = breaks_pretty(),
     limits = c(-max_num, 0)
   ) +
-  labs(x="",y="", caption="source: @ACS_2020")+
+  labs(x="",y="", caption=str_c("source: ",ACS_2020Cite))+
   theme(
     axis.title.y=element_blank(),
     axis.text.y=element_blank(),
@@ -555,7 +556,7 @@ acsDf |>
   select(-concept) |> 
   DT::datatable(
   colnames = c('Place' = 'NAME', 'Level of Education' = 'cleanedLabel', 'Number of People' = 'estimate', 'Year'='year'),
-  caption = "source: @ACS_2010 and @ACS_2020",
+  caption = str_c("source: ",ACS_2010Cite," and ", ACS_2020Cite),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
   ) |> 
   DT::formatPercentage(pctVarName, 0) |>
@@ -580,13 +581,13 @@ acsDf |>
   ))) |> 
      ggplot(aes(x=cleanedLabel, y=estimate, fill=NAME)) +
      geom_bar(stat="identity", position="dodge",color=barOutlineColor)+
-  labs(x="Estimated Population",y="Education Category", fill="Place")+
+  labs(x="Education Category",y="Estimated Population", fill="Place")+
   scale_y_continuous(
     labels = scales::comma,
     breaks = breaks_pretty()
   )
 )|>
-  addPlotlyCaption(captionText="source: @ACS_2020.")
+  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
 ```
 :::::
 ### Housing Units by Year of Construction
@@ -604,7 +605,7 @@ varsWithAComma <- tmpDf |>  select(-NAME,-year) |> names()
 tmpDf |> 
     relocate(Total, .after = last_col()) |> 
   DT::datatable(
-    caption = str_c("Housing Units by Year of Construction, source: ",Census_2020Cite," and ",Census_2010Cite),
+    caption = str_c("Housing Units by Year of Construction, source: ",Census_2010Cite," and ",Census_2020Cite),
   colnames = c('Place' = 'NAME', 'Year'='year'),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -633,7 +634,7 @@ ggplot(aes(x = NAME,
      breaks=pretty_breaks()
    )
 )|>
-  addPlotlyCaption(captionText="source: @ACS_2020.")
+  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
 ```
 :::::
 ### Housing Units by Type of Tenure
@@ -650,7 +651,7 @@ tmpDf <- acsDf |> filter(concept == "TENURE") |>
 tmpDf |> 
   DT::datatable(
     
-  caption = "Housing Units by Tenure Status; source: @ACS_2020 and @ACS_2010",
+  caption = str_c("Housing Units by Tenure Status; source: ",ACS_2020Cite," and ",ACS_2010Cite),
   colnames = c('Place' = 'NAME'),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -673,7 +674,7 @@ plotly::ggplotly(acsDf |> filter(concept == "TENURE", year==currReportYear) |>
      labels = scales::comma,
      breaks=pretty_breaks()
    ))|>
-  addPlotlyCaption(captionText="source: @ACS_2020.")
+  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
 ```
 :::::
 
@@ -694,7 +695,7 @@ acsDf |>
   pivot_wider(values_from = estimate,names_from = cleanedLabel)|> 
   DT::datatable(
   colnames = c('Place' = 'NAME', 'Year'='year'),
-    caption = "source: @ACS_2010 and @ACS_2020",
+    caption = str_c("source: ",ACS_2010Cite," and ",ACS_2020Cite),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
   ) |> 
@@ -727,7 +728,7 @@ acsDf |>
      labels = scales::comma,
      breaks=pretty_breaks()
    ))|>
-  addPlotlyCaption(captionText="source: @ACS_2020.")
+  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
 ```
 :::::
 
@@ -740,7 +741,7 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
   pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
 DT::datatable(
     colnames = c('Place' = 'NAME', 'Year'='year'),
-      caption = "source: @ACS_2010 and @ACS_2020",
+      caption = str_c("source: ",ACS_2010Cite," and ",ACS_2020Cite),
 
       elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -766,7 +767,7 @@ plotly::ggplotly(acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS 
      breaks=pretty_breaks()
    )
 )|>
-  addPlotlyCaption(captionText="source: @ACS_2020.")
+  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
 
 ```
 :::::
@@ -776,7 +777,7 @@ plotly::ggplotly(acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS 
 ```{r}
 #| label: povertyFamilyTable
 pctVarName = "Percentage of Families"
-# All Families, Families Headed by Females, Headed by Female with Related Children under 18
+
 acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel != "Other", cleanedLabel != "Total") |> 
   select(NAME,cleanedLabel,year,estimate) |> 
   mutate(`Poverty Status` = ifelse(str_detect(cleanedLabel,"Above Poverty"),"Above Poverty","Below Poverty"),
@@ -796,7 +797,7 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
   # pivot_wider(names_from = cleanedLabel,values_from = estimate) |> 
 DT::datatable(
   colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Families'='estimate'),
-    caption = "source: @ACS_2010 and @ACS_2020",
+    caption = str_c("source: ",ACS_2010Cite, " and ",ACS_2020Cite),
 
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -833,7 +834,7 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
      labels = scales::comma,
      breaks=pretty_breaks()
    ))|>
-  addPlotlyCaption(captionText="source: @ACS_2020.")
+  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
 ```
 :::::
 
@@ -865,7 +866,7 @@ filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED POPULATION 
   filter(cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
 DT::datatable(
   colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate', 'Industry'='cleanedLabel'),
-    caption = "source: @ACS_2010 and @ACS_2020",
+    caption = str_c("source: ",ACS_2010Cite," and ",ACS_2020Cite),
 
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -896,7 +897,7 @@ acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED PO
      breaks=pretty_breaks()
    )
 )|>
-  addPlotlyCaption(captionText="source: @ACS_2020.")
+  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
 
 ```
 :::::
@@ -917,7 +918,7 @@ acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED PO
   filter(cleanedLabel != "EstimateTotal" & cleanedLabel != "Total") |> 
 DT::datatable(
   colnames = c('Place' = 'NAME', 'Year'='year', 'Number of Jobs' = 'estimate', 'Industry'='cleanedLabel'),
-    caption = "source: @ACS_2010 and @ACS_2020",
+    caption = str_c("source: ",ACS_2010Cite," and ",ACS_2020Cite),
 
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -939,7 +940,7 @@ acsDf |>
   
 DT::datatable(
     colnames = c('Place' = 'NAME', 'Year'='year'),
-      caption = "source: @ACS_2010 and @ACS_2020",
+      caption =str_c("source: ",ACS_2010Cite," and ", ACS_2020Cite),
 
       elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -967,7 +968,7 @@ acsDf |> filter(concept=="MEANS OF TRANSPORTATION TO WORK BY PLACE OF WORK--STAT
      breaks=pretty_breaks()
    )
 )|>
-  addPlotlyCaption(captionText="source: @ACS_2020.")
+  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
 ```
 :::::
 #### Commuting Patterns
@@ -982,7 +983,7 @@ pctWholeVars <- c("")
 empDataWorkSubset |> 
   bind_rows(totalWork) |> 
  DT::datatable(
-  caption = str_c(currentCounty," County laborers by counties where laborers reside, source: @lodes"),
+  caption = str_c(currentCounty," County laborers by counties where laborers reside, source: ",lodesCite),
   colnames = c('Home County' = 'homeCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs', 'Year'='year'),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -992,7 +993,7 @@ empDataWorkSubset |>
 empDataHomeSubset |> 
   bind_rows(totalHome) |> 
  DT::datatable(
-  caption = str_c(currentCounty," County residents by counties where residents work, source: @lodes"),
+  caption = str_c(currentCounty," County residents by counties where residents work, source: ",lodesCite),
   colnames = c('Work County' = 'workCountyName', 'Number of Jobs' = 'numberOfJobs', 'Percentage of Jobs' = 'percentageOfJobs','Year'='year'),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
 
@@ -1019,7 +1020,7 @@ plotly::ggplotly(
      breaks=pretty_breaks()
    )) 
   )|>
-  addPlotlyCaption(captionText="source: @lodes.")
+  addPlotlyCaption(captionText=str_c("source: ", lodesCite))
 
 plotly::ggplotly(
 (empDataHomeSubset |> 
@@ -1034,7 +1035,7 @@ plotly::ggplotly(
      breaks=pretty_breaks()
    )) 
   )|>
-  addPlotlyCaption(captionText="source: @lodes.")
+  addPlotlyCaption(captionText=str_c("source: ",lodesCite))
 ```
 :::::
 ```{=html}
