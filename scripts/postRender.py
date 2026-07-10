@@ -1,6 +1,7 @@
 import os
 import re
 from bs4 import BeautifulSoup
+import subprocess
 
 def replaceExtraHeadersWithDiv(soup):
   for i, header in enumerate(soup.body.find_all('header')):
@@ -19,13 +20,26 @@ def fixA11yIssues(soup):
   addAriaToHeaderNavs(soup)
   
  
+def makePlotlyIdsUnique(soup):
+  for i, plotlyPlot in enumerate(soup.find_all(class_='plotly')):
+    originalId=plotlyPlot.get('id')
+    plotlyPlot['id']="plotlyPlot"+str(i)
+    plotlyPlot.parent.find(attrs={"data-for": originalId})['data-for']="plotlyPlot"+str(i)
 
-# soup.body.find_all('header')[0]
-# soup.body.find_all('header')[1]
-  
 def adjustPlotlySize(soup):
   for plotlyPlot in soup.find_all(class_='plotly'):
     plotlyPlot['style']=re.sub(r'height:\d+px','height:100%',plotlyPlot['style'])
+
+
+# with open(fileName, encoding="utf8") as f:
+#       soup = BeautifulSoup(f,features="html.parser")
+# soup.find_all(class_='plotly')[0]['style']=re.sub(r'height:\d+px','height:100%',soup.find_all(class_='plotly')[0]['style'])
+# ['height']="100%"
+# # for plotlyPlot in soup.find_all(class_='plotly'):
+#   print(plotlyPlot)
+#   print(plotlyPlot.parent.find('script'))
+  # print(f"plotlyId = {plotlyPlot.get['id']}")#" and plotlyScriptId = {plotlyPlot.parent.find('script').get('data-for')}")
+  # 
 countiesInETDD=[
   "Anderson",
   "Blount",
@@ -55,6 +69,7 @@ for county in countiesInETDD:
     with open(fileName, encoding="utf8") as f:
       soup = BeautifulSoup(f,features="html.parser")
     fixA11yIssues(soup)
+    makePlotlyIdsUnique(soup)
     adjustPlotlySize(soup)
     with open(fileName,'w', encoding="utf8") as f:
       f.write(str(soup))
