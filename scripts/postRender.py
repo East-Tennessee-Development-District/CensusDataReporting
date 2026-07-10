@@ -14,13 +14,10 @@ def addAriaToHeaderNavs(soup):
     elif nav.parent.get('id')=='quarto-header':
       nav['aria-label']="website header"
 
-def fixA11yIssues(fileName):
-  with open(fileName, encoding="utf8") as f:
-    soup = BeautifulSoup(f,features="html.parser")
+def fixA11yIssues(soup):
   replaceExtraHeadersWithDiv(soup)
   addAriaToHeaderNavs(soup)
-  with open(fileName,'w', encoding="utf8") as f:
-    f.write(str(soup))
+  
  
 
 # soup.body.find_all('header')[0]
@@ -52,4 +49,8 @@ for county in countiesInETDD:
   else:
     fileName=os.path.join(os.getcwd(),"dev","reports",str(county)+".html")
   if os.path.isfile(fileName):
-    fixA11yIssues(fileName)
+    with open(fileName, encoding="utf8") as f:
+      soup = BeautifulSoup(f,features="html.parser")
+    fixA11yIssues(soup)
+    with open(fileName,'w', encoding="utf8") as f:
+      f.write(str(soup))
