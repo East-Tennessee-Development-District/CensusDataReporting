@@ -23,6 +23,9 @@ def fixA11yIssues(soup):
 # soup.body.find_all('header')[0]
 # soup.body.find_all('header')[1]
   
+def adjustPlotlySize(soup):
+  for plotlyPlot in soup.find_all(class_='plotly'):
+    plotlyPlot['style']=re.sub(r'height:\d+px','height:100%',plotlyPlot['style'])
 countiesInETDD=[
   "Anderson",
   "Blount",
@@ -52,5 +55,6 @@ for county in countiesInETDD:
     with open(fileName, encoding="utf8") as f:
       soup = BeautifulSoup(f,features="html.parser")
     fixA11yIssues(soup)
+    adjustPlotlySize(soup)
     with open(fileName,'w', encoding="utf8") as f:
       f.write(str(soup))
