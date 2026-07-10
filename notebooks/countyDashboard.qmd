@@ -266,14 +266,15 @@ pumsPopDf |>
   labs(
     caption = nhgisCitation,
     color="Place",
-    y="Population"
+    y="Population",
+    x=str_c("Year<br>","source: ",nhgisCitation)
   ) +
   scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
    )
-) |> addPlotlyCaption(str_c("source: ",nhgisCitation))
-# )
+# ) |> addPlotlyCaption(str_c("source: ",nhgisCitation),fontsize=12)
+)
 ```
 :::::
 
@@ -312,8 +313,7 @@ plotly::ggplotly((censusDf |> filter(cleanedLabel == "populationDensity") |>
   ggplot(aes(x=NAME,y=value))+
   geom_bar(stat='identity', fill=barColor,color=barOutlineColor)+
   labs(y="Population Density",
-       x="",
-       caption = str_c("Density is population / area (in square miles); source: ",Census_2020Cite))+
+       x=str_c("Density is population / area (in square miles)<br>source: ",Census_2020Cite))+
   # annotate("text",x = 1, y = -1, hjust=100, vjust=-50,
            # label="Density is population / area (in square miles); source: @Census_2020")+
    scale_y_continuous(
@@ -321,8 +321,7 @@ plotly::ggplotly((censusDf |> filter(cleanedLabel == "populationDensity") |>
      breaks=pretty_breaks()
    )), elementId= "TEST"
   )
-) |>
-  addPlotlyCaption(captionText=str_c("Density is population / area (in square miles); source: ",Census_2020Cite))
+) 
   # plotly::add_annotations(text = "Density is population / area (in square miles); source: @Census_2020.")
   
 
@@ -396,6 +395,7 @@ censusDf |>
 DT::datatable(
   colnames = c('Place' = 'NAME','Number of People' = 'value',
                'Race Category' = 'cleanedLabel'),
+  caption = str_c("source: ",Census_2010Cite," and ", Census_2020Cite),
     elementId = paste0("DataTables_",tableId),   rownames = FALSE
   ) |> 
   DT::formatCurrency('Number of People', currency = "", digits=0) |> 
@@ -433,16 +433,15 @@ plotly::ggplotly( censusDf |> filter(concept=="RACE", cleanedLabel != "Total", !
   ggplot(aes(x=cleanedLabel, y=value, fill=NAME))+
   geom_bar(stat="identity",position="dodge",color=barOutlineColor)+
   labs(
-    x="Racial Category",
+    x=str_c("Racial Category<br>source: ",Census_2020Cite),
     y="Estimated Population",
     fill="Place"
-  )+
+  ) +
   scale_y_continuous(
     labels = scales::comma,
     breaks = breaks_pretty()
   )
-)|>
-  addPlotlyCaption(captionText=str_c("Density is population / area (in square miles); source: ",Census_2020Cite))
+)
 
 ```
 
@@ -581,13 +580,12 @@ acsDf |>
   ))) |> 
      ggplot(aes(x=cleanedLabel, y=estimate, fill=NAME)) +
      geom_bar(stat="identity", position="dodge",color=barOutlineColor)+
-  labs(x="Education Category",y="Estimated Population", fill="Place")+
+  labs(x=str_c("Education Category<br>source: ",Census_2020Cite),,y="Estimated Population", fill="Place")+
   scale_y_continuous(
     labels = scales::comma,
     breaks = breaks_pretty()
   )
-)|>
-  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
+)
 ```
 :::::
 ### Housing Units by Year of Construction
@@ -626,15 +624,14 @@ ggplot(aes(x = NAME,
   geom_bar(position = "fill", stat = "identity",color=barOutlineColor) +
   labs(y = "Percent", 
        fill="Year Structure Built",
-       x = "",
+       x=str_c("source: ",Census_2020Cite),
        title = "Year Structure Built by Place")+
    # scale_x_discrete(guide = guide_axis(n.dodge=3))+
    scale_y_continuous(
      labels = scales::percent,
      breaks=pretty_breaks()
    )
-)|>
-  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
+)
 ```
 :::::
 ### Housing Units by Type of Tenure
@@ -667,14 +664,13 @@ plotly::ggplotly(acsDf |> filter(concept == "TENURE", year==currReportYear) |>
   ggplot(aes(x=NAME, y= estimate, fill = cleanedLabel)) +
     geom_bar(position = position_dodge(preserve = "single"),stat="identity",color=barOutlineColor)+
   labs(y="Estimated Number of Houses",
-       x="",
+       x=str_c("source: ",Census_2020Cite),
        fill="Type of Tenure")+
   # scale_x_discrete(guide = guide_axis(n.dodge=3))+
    scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
-   ))|>
-  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
+   ))
 ```
 :::::
 
@@ -717,7 +713,7 @@ acsDf |>
                yend = reorder(NAME, estimate)),
                color = "lightgrey") +
   geom_point(color="blue", size = 2) +
-  labs (x = "Income (per capita)",
+  labs (x=str_c("Income (per capita)<br>source: ",Census_2020Cite),
         y = "",
         title = "Income by Municipality",
         subtitle = str_c("(",currentCounty," County)")) +
@@ -727,8 +723,7 @@ acsDf |>
    scale_x_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
-   ))|>
-  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
+   ))
 ```
 :::::
 
@@ -759,16 +754,14 @@ plotly::ggplotly(acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS 
   ggplot(aes(x=NAME, y=estimate, fill=cleanedLabel))+
   geom_bar(stat = "identity", position = "dodge")+
   labs(y="Estimated Number of Families",
-       x="",
+       x=str_c("source: ",Census_2020Cite),
        fill="Poverty Status")+
   # scale_x_discrete(guide = guide_axis(n.dodge=3))+
    scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
    )
-)|>
-  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
-
+)
 ```
 :::::
 
@@ -808,12 +801,13 @@ DT::datatable(
   DT::formatPercentage(pctVarName, digits=2)
 tableId <- tableId+1
 ```
+:::{.row}
 
 ```{r}
-#| label: povertyFamilyGraph
+#| label: povertyFamilyGraphOptOne
 #| fig.alt: "A bar graph showing the poverty status by family data"
 plotly::ggplotly(
-acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel != "Other") |> 
+acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel != "Other", cleanedLabel != "Total", year==2020, NAME=="Anderson County") |> 
   select(NAME,cleanedLabel,year,estimate) |> 
    mutate(`Poverty Status` = ifelse(str_detect(cleanedLabel,"Above Poverty"),"Above Poverty","Below Poverty"),
          `Family Type` = case_when(
@@ -824,18 +818,49 @@ acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FA
            .default="All Other Families"
          )
   ) |> 
+  summarize(estimate=sum(estimate), .by = c(`Poverty Status`,`Family Type`))|> 
   ggplot(aes(x=`Poverty Status`,y=estimate,fill=`Family Type`))+
   geom_bar(stat="identity", position="stack")+
   labs(y="Estimated Number of Families",
-       x="",
+       x=str_c("source: ",Census_2020Cite),
        fill="Family Type")+
   # scale_x_discrete(guide = guide_axis(n.dodge=3))+
    scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
-   ))|>
-  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
+   ))
 ```
+```{r}
+#| label: povertyFamilyGraph
+#| fig.alt: "A bar graph showing the poverty status by family data"
+plotly::ggplotly(
+acsDf |> filter(concept=="POVERTY STATUS IN THE PAST 12 MONTHS OF FAMILIES BY FAMILY TYPE BY PRESENCE OF RELATED CHILDREN UNDER 18 YEARS BY AGE OF RELATED CHILDREN", cleanedLabel != "Other", cleanedLabel != "Total", year==2020) |> 
+  select(NAME,cleanedLabel,year,estimate) |> 
+   mutate(`Poverty Status` = ifelse(str_detect(cleanedLabel,"Above Poverty"),"Above Poverty","Below Poverty"),
+         `Family Type` = case_when(
+           str_detect(cleanedLabel, "Female Householder with related children")
+           ~ "Female Householder with related children",
+           str_detect(cleanedLabel,"Female Householder")
+           ~ "Female Householder",
+           .default="All Other Families"
+         )
+  ) |> 
+  # summarize(estimate=sum(estimate), .by = c(`Poverty Status`,`Family Type`))|> 
+  ggplot(aes(x=NAME,y=estimate,fill=`Family Type`))+
+  geom_bar(stat="identity", position="dodge")+
+  labs(y="Estimated Number of Families",
+       fill="")+
+  # scale_x_discrete(guide = guide_axis(n.dodge=3))+
+   scale_y_continuous(
+     labels = scales::comma,
+     breaks=pretty_breaks()
+   ) +
+  facet_wrap(~`Poverty Status`, 
+             ncol = 2) +
+  labs(x=str_c("<br>source: ",Census_2020Cite))
+)
+```
+::::
 :::::
 
 #### Employment by Industry
@@ -889,15 +914,14 @@ acsDf |> filter(concept == "INDUSTRY BY OCCUPATION FOR THE CIVILIAN  EMPLOYED PO
   geom_bar(stat = "identity", position = "dodge",color=barOutlineColor)+
   theme(legend.position = "none")+
   labs(y="Estimated Number of Workers",
-       x="Place",
+       x=str_c("source: ",Census_2020Cite),
        fill="Type of Tenure")+
   # scale_x_discrete(guide = guide_axis(n.dodge=3))+
    scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
    )
-)|>
-  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
+)
 
 ```
 :::::
@@ -960,15 +984,14 @@ acsDf |> filter(concept=="MEANS OF TRANSPORTATION TO WORK BY PLACE OF WORK--STAT
   ggplot(aes(x=cleanedLabel,y=estimate,fill=NAME))+
   geom_bar(stat="identity",color=barOutlineColor, position="dodge",color=barOutlineColor)+
   labs(y="Estimated Number of Workers",
-       x="",
+       x=str_c("source: ",Census_2020Cite),
        fill="Place of Work")+
   # scale_x_discrete(guide = guide_axis(n.dodge=3))+
    scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
    )
-)|>
-  addPlotlyCaption(captionText=str_c("source: ",ACS_2020Cite))
+)
 ```
 :::::
 #### Commuting Patterns
@@ -1012,30 +1035,28 @@ plotly::ggplotly(
     filter(year==currReportYear) |> 
   ggplot(aes(x=homeCountyName,y=numberOfJobs)) +
   geom_bar(stat = "identity",fill=barColor,color=barOutlineColor)+
-  labs(x = "Home County", 
+  labs(x=str_c("Home County<br>source: ",Census_2020Cite),
        y = "Number of Jobs", 
        title = "Number of Jobs by County")+
      scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
    )) 
-  )|>
-  addPlotlyCaption(captionText=str_c("source: ", lodesCite))
+  )
 
 plotly::ggplotly(
 (empDataHomeSubset |> 
     filter(year==currReportYear) |> 
   ggplot(aes(x=workCountyName,y=numberOfJobs)) +
   geom_bar(stat = "identity",fill=barColor,color=barOutlineColor)+
-  labs(x = "Work County", 
+  labs(x=str_c("Work County<br>source: ",Census_2020Cite),
        y = "Number of Jobs", 
        title = "Number of Jobs by County")+
      scale_y_continuous(
      labels = scales::comma,
      breaks=pretty_breaks()
    )) 
-  )|>
-  addPlotlyCaption(captionText=str_c("source: ",lodesCite))
+  )
 ```
 :::::
 ```{=html}
