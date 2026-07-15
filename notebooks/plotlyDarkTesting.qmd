@@ -1,0 +1,28 @@
+---
+title: "plotlyTesting"
+format: dashboard
+theme: 
+  light: [../resources/customColorOne.scss, flatly]
+  dark: [../resources/customColorOne.scss, darkly]
+editor: source
+---
+
+```{r}
+df <- mtcars
+library(ggplot2)
+theme_light <- thematic::thematic_theme(bg = "white", fg = "black", accent = "cornflowerblue")
+theme_dark <- thematic::thematic_theme(bg = "black", fg = "white", accent = "cornflowerblue")
+```
+Testing
+```{r}
+#| label: sampleGraph
+#| fig.alt: "A line graph showing the population data"
+#| renderings: [light, dark]
+p <- df |> ggplot(aes(x=mpg,y=wt))+
+  geom_point()
+thematic::thematic_set_theme(theme_light)
+plotly::ggplotly(p)
+thematic::thematic_set_theme(theme_dark)
+plotly::ggplotly(p)
+```
+

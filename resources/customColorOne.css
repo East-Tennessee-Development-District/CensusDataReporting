@@ -1,0 +1,66 @@
+
+.quarto-title-block .quarto-title-banner {
+
+  background-image: url(ETDDLogo.svg);
+
+  background-size: 300px;
+  background-position: left;
+  background-repeat: no-repeat;
+  padding-left: 10px;
+  background-origin: content-box;
+}
+/*
+table.dataTable tr.odd { background-color: white;  border:1px lightgrey;}
+table.dataTable tr.even{ background-color: white; border:1px lightgrey; }
+*/
+
+.v-center-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          height: 90%;
+        }
+
+@counter-style sparkles {
+  system: cyclic;
+  fallback: square;
+  symbols: "\2728";
+  suffix: " ";
+  speak-as: bullets;
+}
+
+.etddBulletPoint {
+  
+   li {list-style: url('../assets/ETDDLogo.svg') thumbs;} 
+  
+  li::marker{
+   /* content: url('../../assets/ETDDLogo.svg') / "+";*/
+    font-size: 1.8em;
+    line-height: .5;
+   
+  }
+}
+
+
+.sparklesBulletPoint {
+   li {
+    list-style: sparkles;
+    filter: brightness(80%)
+    sepia(100%) 
+    hue-rotate(150deg)
+    saturate(500%);
+    
+  } 
+  li::marker{
+   font-size: 0.8em;
+    line-height: 0.1;
+    
+  }
+} 
+
+.reveal .slide-footnotes {
+  overflow-y: auto;
+}
+.reveal .scrollable-region {
+  overflow-y: auto;
+}

@@ -3,16 +3,16 @@ project:
   post-render: scripts/postRender.py
   render:
     - index.qmd
-    - "reports/*.qmd"
-    # - reports/Anderson.qmd
-    # - reports/dataSources.qmd
+    # - "reports/*.qmd"
+    - reports/Anderson.qmd
+    - reports/dataSources.qmd
     # - reports/Blount.qmd
     # - reports/Campbell.qmd
     # - reports/Claiborne.qmd
   output-dir: docs
   type: website
 profile:
-  default: dev
+  default: colorOne
 website:
   navbar:
     background: primary
@@ -52,16 +52,11 @@ logo:
   medium: common_shared_assets/assets/ETDDLogo.svg
 format: 
   dashboard:
-    css: common_shared_assets/stylesheets/custom.css
     embed-resources: true   
     orientation: rows
-    theme: 
-        light: [common_shared_assets/stylesheets/custom.scss,flatly]
     scrolling: true
     echo: false
   html:
     css: common_shared_assets/stylesheets/custom.css
-    theme:
-      light: [common_shared_assets/stylesheets/custom.scss,flatly]
 execute: 
   cache: true
