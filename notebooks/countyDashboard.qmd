@@ -26,6 +26,7 @@ if (exists("fxsVars")) {
   source(here::here("scripts","fxsAndVars.R"))
 }
 source(here::here("scripts","defineColors.R"))
+source(here::here("scripts","plotTheme.R"))
 
 currentCounty <- params$county
 currentMunicipalities <- paste0("municipalitiesIn",currentCounty,"NameOnly")
@@ -145,22 +146,7 @@ if (file.exists(here::here("data","clean","censusDataCombined.csv"))) {
 placesShapeFile  <- loadSfIfExists(here::here("data","clean","tigerFiles2020place.gpkg"))
 countiesShapeFile <- loadSfIfExists(here::here("data","clean","tigerFiles2020county.gpkg"))
 
-theme_set(theme_classic() +
-            theme(axis.text.x=
-                    element_text(angle=45,
-                                 hjust=1)
-            ))
-scale_colour_discrete <- scale_colour_viridis_d
-options(ggplot2.continuous.colour="mako")
-options(ggplot2.continuous.fill = "mako")
-options(ggplot2.discrete.colour = "mako_d")
-options(ggplot2.discrete.fill = "mako_d")
-options(ggplot2.ordinal.colour = "mako")
-options(ggplot2.ordinal.fill = "mako")
-scale_fill_discrete <- function(...) {
-   #scale_fill_manual(..., values = viridis_qualitative_pal7)
-  viridis::scale_fill_viridis(discrete = TRUE, option="G")
-} 
+
 options(DT.options = list(filter="top",
     extensions = c('Buttons', 
      'FixedHeader'),
@@ -175,7 +161,7 @@ options(DT.options = list(filter="top",
     "$(this.api().table().header()).css({'background-color': '#015a71', 'color': '#fff'});",
     "}")
     )))
-library(shiny)
+# thematic::thematic_on(bg = "#222222", fg = "white", accent = "#0CE3AC", font = "Oxanium")
 
 ```
 
@@ -239,16 +225,13 @@ pumsPopDf |>
   DT::formatCurrency(varsWithoutAComma, currency = "", digits=1)
 tableId <- tableId+1
 ```
-```{r}
+```{r} 
 #| label: popGraph
 #| fig.alt: "A line graph showing the population data"
-
+#| renderings: [light, dark]
 # plotly::plotlyOutput(outputId = paste0("plot_",tableId))
 # plotly::renderPlotly(
-plotly::ggplotly(
-  
-
-pumsPopDf |> 
+p <- pumsPopDf |> 
   pivot_longer(
     cols = c(-NAME,-starts_with("Change")),
     names_to = "year",
@@ -273,8 +256,11 @@ pumsPopDf |>
      labels = scales::comma,
      breaks=pretty_breaks()
    )
-# ) |> addPlotlyCaption(str_c("source: ",nhgisCitation),fontsize=12)
-)
+
+thematic::thematic_set_theme(theme_light)
+plotly::ggplotly(p)
+thematic::thematic_set_theme(theme_dark)
+plotly::ggplotly(p)
 ```
 :::::
 

@@ -102,6 +102,54 @@ Because it is plotly and is desiged to work with html, you should use `<br>` [ht
 
 For the text running off of the screen, switching to a smaller but still readable font size fixed the problem.
 
+### Lightmode / darkmode themes
+
+Using thematic with something like:
+```{r}
+#| renderings: [light, dark]
+par(bg = "#FFFFFF", fg = "#000000")
+plot(1:10) # Shown in `light` mode
+
+par(bg = "#000000", fg = "#FFFFFF", col.axis = "#FFFFFF")
+plot(1:10) # Shown in `dark` mode
+```
+will reduce reliance on third-party scripts + help reduce the risk of code breaking.
+Doing
+```{r}
+#| renderings: [light, dark]
+p = plotly::ggplotly(ggplot([...]))
+thematic::thematic_on(bg = "#222222", fg = "red", accent = "#0CE3AC", font = "Oxanium")
+p
+thematic::thematic_on(bg = "#red", fg = "white", accent = "#0CE3AC", font = "Oxanium")
+p
+```
+will just produce the same graph twice, so I need to find a way to fix that without repeating the code (otherwise there's a good chance of future issues if the graphs change at all)
+https://quarto.org/docs/computations/execution-options.html#cell-renderings
+
+Unfortunately, currently it seems as though the scss file is creating an issue with thematic- will follow up on this later
+
+
+#### Second Thought:
+This will be difficult to maintain long term, and using themeatic + the quarto feature would be more straightforward
+I found an easier option:
+https://aymennasri.github.io/posts/Quarto%20Plots%20Theme%20Switcher/
+
+Later it might be worthwhile to use the option below
+#### First thought
+If we include both a light mode and a dark mode, we need to adjust our plots for accessibility and style (e.g. white backgrounds are not dark mode, text color issues)
+Apparently, we can do something like 
+
+```{r}
+#| renderings: [light, dark]
+par(bg = "#FFFFFF", fg = "#000000")
+plot(1:10) # Shown in `light` mode
+
+par(bg = "#000000", fg = "#FFFFFF", col.axis = "#FFFFFF")
+plot(1:10) # Shown in `dark` mode
+```
+
+https://quarto.org/docs/computations/execution-options.html#cell-renderings
+
 ## Misc
 
 ### Issues with file formatting
