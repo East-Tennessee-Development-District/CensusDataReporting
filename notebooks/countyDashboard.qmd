@@ -184,7 +184,7 @@ Topics that will be discussed in this summary report for `r currentCounty` Count
   - employment classification according to industry;
   - labor force by place of work and commuting patterns;
 
-For more details on the data used, please see the Data Description tab.
+For more details on the data used, please see the [Data Description](dataDescription.qmd) tab.
 
 ### Map
 ```{r}
