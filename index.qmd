@@ -1,56 +1,50 @@
 ---
-title: "Home"
+title: "ETDD Census Data"
 format: html
 ---
 
-## ETDD Census Reporting
+This report examines statistical data from U.S. Census materials with a focus on economic and demographic characteristics for the 16 counties that make up the East Tennessee Development District. It uses data from the U.S. Decennial Census and American Community Survey Five-year Estimates as its primary sources, with supplemental material from the National Historical Geographic Information System and the LEHD Origin-Destination Employment Statistics (LODES). Please see the [Data Description](reports/dataSources.qmd) Tab for a detailed list of where the data comes from and a high-level description of any data management.
 
-This is the ETDD Census Reporting Dashboard for our counties. It is currently not complete.
-This report examines statistical data from U.S. Census materials with a focus on economic and demographic characteristics for the 16 counties that make up the East Tennessee Development District. It uses data from the U.S. Decennial Census and American Community Survey Five-year Estimates as its primary sources, with supplemental material from the National Historical Geographic Information System and the LEHD Origin-Destination Employment Statistics (LODES). Please see the Data Description Tab for a detailed list of where the data comes from.
+<!-- :::{.panel-tabset} -->
+::::{.columns}
+:::{.column}
+# [Data in Each Sub-Dashboard]{style="font-size: 0.75em"}
 
-## Data in Each Sub-Dashboard
+Topics that will be discussed in the summary report for each county are:
 
-Topics that will be discussed in the summary report for each county are
 - Demographic Characteristics
-  - Population growth from 1970 to 2020;
+
+
+  - Population growth from 1970 to 2020
+
   - population density
+
   - sex, race, and age
+
   - educational level of the adult population
+
   - housing characteristics in terms of age of the housing stock and type of tenure
-- Economic Characteristics
-  - family income, household income, per capita income,
-  - poverty status of families;
-  - employment classification according to industry;
-  - labor force by place of work and commuting patterns;
 
+- Economic Characteristics:
 
-### How to use
-Hover over "Counties", then click on the county you want information for
+  - family income, household income, and per capita income
 
-Click on the tab for the category of information you want
+  - poverty status of families
 
-Click on the tab for the table and graph you want
+  - employment classification according to industry
 
-Some graphs are interactive- if you hover your mouse over them you will notice controls like zooming in or out. You can hover over data points to get the exact numbers and category label (which are also in the corresponding table). You can click and drag to limit the graph to a smaller part of the overall data. On some graphs, if you click on the color boxes to the side you can show/hide some of the categories in the graph.
+  - labor force by place of work and commuting patterns
 
-### Known issues
+::::
+:::{.column .darkbg .callout-note}
 
-- Overlapping axis labels
-- Inconsistency between interactive vs static graphs
-- Missing accessibility check on drop down
-- Missing Data Description
-- Introduction on each dashboard requires rewriting + formatting
-- Missing map on each dashboard
-- Missing details on Data Sources
-- Missing data export option for tables
-- Raw labels for data in interactive graphs
-- Some tables and graphs missing data sources
-- Dark mode breaks some table's readability
+# How to use this report
+- Hover over "Counties", then click on the county you want information for
 
-### Anticipated improvements
+- Click on the tab for the category of information you want
 
-- Include more interactivity (Shiny)
-- Include option for patterns instead of colors on graphs
-- Include ability to export tables easily
-- Include District-wide view
-- Improve styling
+- Click on the tab for the table and graph you want
+
+- Most graphs are interactive- if you hover your mouse over them you will notice controls like zooming in or out. You can hover over data points to get the exact numbers and category label (which are also in the corresponding table). You can click and drag to limit the graph to a smaller part of the overall data. On some graphs, if you click on the color boxes to the side you can show/hide some of the categories in the graph.
+::::
+:::::
