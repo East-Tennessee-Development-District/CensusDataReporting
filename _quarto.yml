@@ -3,22 +3,22 @@ project:
   post-render: scripts/postRender.py
   render:
     - index.qmd
-    # - "reports/*.qmd"
-    - reports/Anderson.qmd
-    - reports/dataSources.qmd
+    - "reports/*.qmd"
+    # - reports/Anderson.qmd
+    # - reports/dataSources.qmd
     # - reports/Blount.qmd
     # - reports/Campbell.qmd
     # - reports/Claiborne.qmd
   output-dir: docs
   type: website
 profile:
-  default: colorOne
+  default: prod
 website:
   navbar:
     background: primary
     search: true
     left:
-      - text: ETDD Census Data
+      # - text: ETDD Census Data
       - index.qmd
       - reports/dataSources.qmd
       - text: "Counties"
@@ -69,5 +69,7 @@ format:
     footnotes-hover: false
     crossrefs-hover: false
     toc: true
+
+    
 execute: 
   cache: true
