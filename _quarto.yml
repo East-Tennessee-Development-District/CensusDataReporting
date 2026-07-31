@@ -45,18 +45,29 @@ website:
 #       - text: "Data Description"
 #         href: DataDescription.qmd 
 bibliography: resources/references.bib
-csl: common_shared_assets/citations/chicago-notes-bibliography-access-dates.csl
+csl: common_shared_assets/citations/chicago-consistent-notes-intext-bibliography-access-dates.csl
 
 logo:
   small: common_shared_assets/assets/ETDDLogo.svg
   medium: common_shared_assets/assets/ETDDLogo.svg
+  
 format: 
   dashboard:
+    css: common_shared_assets/stylesheets/custom.css
     embed-resources: true   
     orientation: rows
+    theme: [common_shared_assets/stylesheets/dashboardColorOne.scss,flatly]
     scrolling: true
     echo: false
+    citations-hover: false
+    footnotes-hover: false
+    crossrefs-hover: false
   html:
     css: common_shared_assets/stylesheets/custom.css
+    theme: [common_shared_assets/stylesheets/dashboardColorOne.scss, flatly]
+    citations-hover: false
+    footnotes-hover: false
+    crossrefs-hover: false
+    toc: true
 execute: 
   cache: true
