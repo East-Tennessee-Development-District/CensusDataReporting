@@ -1,0 +1,13 @@
+format: 
+  dashboard:
+    css: resources/customColorTwo.css
+    embed-resources: true   
+    orientation: rows
+    theme: 
+        light: [resources/customColorTwo.scss,flatly]
+    scrolling: true
+    echo: false
+  html:
+    css: resources/customColorTwo.css
+    theme:
+      light: [resources/customColorTwo.scss,flatly]

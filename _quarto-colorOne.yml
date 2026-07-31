@@ -1,0 +1,13 @@
+project: 
+  output-dir: dev
+format: 
+  dashboard:
+    css: resources/customColorOne.css
+    embed-resources: true   
+    orientation: rows
+    theme: 
+        light: [resources/customColorOne.scss,flatly]
+        dark: [resources/customColorOne.scss,darkly]
+    scrolling: true
+    echo: false
+  

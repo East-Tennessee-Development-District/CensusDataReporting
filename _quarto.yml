@@ -1,20 +1,24 @@
 project:
+  pre-render: scripts/preRender.py
+  post-render: scripts/postRender.py
   render:
     - index.qmd
     - "reports/*.qmd"
     # - reports/Anderson.qmd
+    # - reports/dataSources.qmd
     # - reports/Blount.qmd
     # - reports/Campbell.qmd
     # - reports/Claiborne.qmd
   output-dir: docs
   type: website
-
+profile:
+  default: prod
 website:
   navbar:
     background: primary
     search: true
     left:
-      - text: ETDD Census Data
+      # - text: ETDD Census Data
       - index.qmd
       - reports/dataSources.qmd
       - text: "Counties"
@@ -41,25 +45,31 @@ website:
 #       - text: "Data Description"
 #         href: DataDescription.qmd 
 bibliography: resources/references.bib
-csl: resources/chicago-notes-intext-bibliography-access-dates.csl
+csl: common_shared_assets/citations/chicago-consistent-notes-intext-bibliography-access-dates.csl
 
 logo:
-  small: /resources/ETDDLogo.svg
-  medium: /resources/ETDDLogo.svg
+  small: common_shared_assets/assets/ETDDLogo.svg
+  medium: common_shared_assets/assets/ETDDLogo.svg
+  
 format: 
   dashboard:
-    css: resources/custom.css
+    css: common_shared_assets/stylesheets/custom.css
     embed-resources: true   
     orientation: rows
-    theme: 
-        light: flatly
-        dark: darkly
+    theme: [common_shared_assets/stylesheets/dashboardColorOne.scss,flatly]
     scrolling: true
     echo: false
+    citations-hover: false
+    footnotes-hover: false
+    crossrefs-hover: false
   html:
-    css: resources/custom.css
-    theme:
-      light: flatly
-      dark: darkly
+    css: common_shared_assets/stylesheets/custom.css
+    theme: [common_shared_assets/stylesheets/dashboardColorOne.scss, flatly]
+    citations-hover: false
+    footnotes-hover: false
+    crossrefs-hover: false
+    toc: true
+
+    
 execute: 
   cache: true

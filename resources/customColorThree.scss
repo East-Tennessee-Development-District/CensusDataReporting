@@ -1,0 +1,71 @@
+
+/*-- scss:global --*/
+
+$etdd-green: #76A487 !default;
+$etdd-green-on-white-bg: #548064 !default;
+$dark-etdd-green: #406c51 !default;
+$etdd-accent-red: #e05a47 !default;
+$etdd-dark-accent-red: #bd3929 !default;
+$etdd-green-for-bg: #b5e5c6 !default;
+$etdd-green-for-lighter-bg: #ceffdf !default;
+$etdd-blue: #165570 !default;
+$etdd-light-blue-accent: #3f7a97 !default;
+$etdd-dark-blue-accent: #0d4e6a !default;
+$highlight-color: #59CDFF !default;
+
+
+/*-- scss:defaults --*/
+
+// Base document colors
+$body-bg: $etdd-green-for-lighter-bg;
+$body-color: $etdd-blue;
+$link-color: $etdd-dark-blue-accent;
+$callout-color-tip: $etdd-green-on-white-bg;
+$callout-color-important: $etdd-accent-red;
+$presentation-font-smaller: .8;
+
+/*-- scss:rules --*/
+.panel-caption, .figure-caption, .subfigure-caption, .table-caption, figcaption, caption {
+	font-size: .9rem;
+	color: $body-color;
+}
+.reveal .speaker-notes .notes-placeholder {
+  color: #000 !important;
+}
+.reveal .slides section {
+    display: flex;
+    flex-direction: row;
+   
+}
+.reveal .slides .columns .column{
+  height:100%;
+}
+
+.reveal .slides .larger-text{
+  
+  font-size-adjust: 1.5;
+}
+.reveal .slides .smaller-text{
+  
+  font-size-adjust: 0.4;
+  line-height: .8;
+}
+
+
+.reveal .slides .darkbg {
+    align-self: stretch;
+    flex-grow:1;
+    color: $body-bg;
+    background-color: $body-color;
+    border: 0.5em solid $body-color;
+    height: 90%;
+}
+.reveal .slides .fragment.highlight-current-red.current-fragment {
+  color: $highlight-color;
+  text-decoration: underline $highlight-color solid 0.1em;
+  
+}
+.reveal .slides .fragment.highlight-current-blue.current-fragment {
+  text-decoration: underline solid 0.1em;
+  
+}

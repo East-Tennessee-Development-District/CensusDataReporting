@@ -1,0 +1,13 @@
+format: 
+  dashboard:
+    css: resources/customColorThree.css
+    embed-resources: true   
+    orientation: rows
+    theme: 
+        light: [resources/customColorThree.scss,flatly]
+    scrolling: true
+    echo: false
+  html:
+    css: resources/customColorThree.css
+    theme:
+      light: [resources/customColorThree.scss,flatly]
