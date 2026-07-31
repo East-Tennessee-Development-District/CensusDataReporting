@@ -15,7 +15,7 @@ def makeCitationQmd(pathToReferences,folderWhereCitations):
       citationStr=re.sub(r'\w*{','',citation)
       dictOfCites[re.sub(r'@','',citationStr)]=citationStr
   with open(os.path.join(os.getcwd(),folderWhereCitations,"citations.qmd"),'w', encoding='utf-8') as f:
-    strToWrite='---\ntitle: \"Citations\"\nformat: html\ncsl: ../common_shared_assets/citations/chicago-notes-bibliography-access-dates.csl\nbibliography: ../common_shared_assets/citations/references.bib\n---\n\n'
+    strToWrite='---\ntitle: \"Citations\"\nformat: html\ncsl: ../common_shared_assets/citations/chicago-notes-intext-bibliography-access-dates.csl\nbibliography: ../common_shared_assets/citations/references.bib\n---\n\n'
     for citation in dictOfCites.keys():
       strToWrite=strToWrite+"# " + str(citation) + "\n\n" + dictOfCites.get(citation) + "\n\n"
     f.write(strToWrite)
