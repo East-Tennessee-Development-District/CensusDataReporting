@@ -24,14 +24,8 @@ Any data from the American Community Survey represents an average of the last fi
 
 IPUMS NHGIS, University of Minnesota, www.nhgis.org 
 
-## Packages used
-Please note: this list is currently incomplete and will be updated at a later date
 
-@tidyCensus
-
-@ipumsr
-
-## Data Management
+# Data Management
 
 High level description:
 ACS and Census column labels were cleaned to standardize them and prepare them for analysis and place names were changed to a more readable form. The data was subset to only those counties in ETDD's counties. Data was aggregated where needed to form Place-level and County-level data- in some cases this required combining place-level data for places that are in multiple counties (e.g. Oak Ridge).
@@ -41,4 +35,12 @@ Tiger files were used to get the area of each municipality and county. The area 
 IPUMS data was subset, the column names were changed, and changes from year to year were calculated and added to the data.
 
 LODES data was combined at the county level and the crosswalk was used to add the correct label for each county.
+
+# Packages used
+Please note: this list is currently incomplete and will be updated at a later date
+
+@tidyCensus
+
+@ipumsr
+
 
